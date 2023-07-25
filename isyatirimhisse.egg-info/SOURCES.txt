@@ -1,0 +1,12 @@
+LICENSE.txt
+README.md
+setup.py
+isyatirimhisse/VeriCek.py
+isyatirimhisse/__init__.py
+isyatirimhisse.egg-info/PKG-INFO
+isyatirimhisse.egg-info/SOURCES.txt
+isyatirimhisse.egg-info/dependency_links.txt
+isyatirimhisse.egg-info/requires.txt
+isyatirimhisse.egg-info/top_level.txt
+tests/__init__.py
+tests/test_veri_cek.py
