@@ -1,0 +1,4 @@
+dist/
+isyatirimhisse.egg-info/
+MANIFEST.in
+setup.py
