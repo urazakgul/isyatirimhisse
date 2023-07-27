@@ -1,5 +1,4 @@
 import requests
-import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -23,13 +22,13 @@ def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', 
         pandas.DataFrame: İstenilen tarih aralığındaki hisse senedi verileri ve gerekirse getiri değerleri içeren DataFrame.
     """
 
-    if sembol is None:
+    if not sembol or sembol is None:
         raise KeyError("Hisse senedi sembolü girilmedi. 'sembol' parametresi zorunludur.")
 
-    if baslangic_tarih is None:
+    if not baslangic_tarih or baslangic_tarih is None:
         raise KeyError("Başlangıç tarihi girilmedi. 'baslangic_tarih' parametresi zorunludur.")
 
-    if bitis_tarih is None:
+    if not bitis_tarih or bitis_tarih is None:
         bitis_tarih = datetime.now().strftime('%d-%m-%Y')
 
     if not isinstance(sembol, list):
@@ -40,7 +39,10 @@ def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', 
     for s in sembol:
         url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
         url += f"hisse={s}&startdate={baslangic_tarih}&enddate={bitis_tarih}&frequency={frekans}.json"
-        result = json.loads(requests.get(url).text)
+        res = requests.get(url)
+        if not res.status_code == 200:
+            raise ConnectionError("Gönderdiğiniz istek İş Yatırım tarafından reddedildi.")
+        result = res.json()
         historical = (
             pd.DataFrame(result['value'])
             .loc[:, ['HGDG_TARIH', 'HGDG_KAPANIS']]
