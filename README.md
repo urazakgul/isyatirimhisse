@@ -1,4 +1,4 @@
-# isyatirimhisse v0.1.0
+# isyatirimhisse v0.1.1
 
 ## Aciklama
 
@@ -179,6 +179,16 @@ print(veriler)
 
 * Ilk surum yayinlandi.
 
+### v0.1.1 - 27/07/2023
+
+* `veri_cek` fonksiyonundaki parametreleri kontrol eden kosul ifadeleri guncellendi.
+* `json` kutuphanesi kaldirildi.
+* `veri_cek` fonksiyonuna `200` HTTP kodu kosul ile beraber eklendi ve takibe alindi.
+
 ## Lisans
 
 Bu proje MIT Lisansi altinda lisanslanmistir.
+
+## Katkida Bulunanlar
+
+- [Sinan Erdinc](https://github.com/sinanerdinc)
