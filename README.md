@@ -1,36 +1,34 @@
 # isyatirimhisse v0.1.1
 
-## Aciklama
+## Açıklama
 
-`isyatirimhisse`, Is Yatirim'in web sitesinden veri cekme islemlerini kolaylastirmak amaciyla gelistirilmis, istege gore ozellestirilebilir bir Python kutuphanesidir.
+`isyatirimhisse`, İş Yatırım'ın web sitesinden veri çekme işlemlerini kolaylaştırmak amacıyla geliştirilmiş, isteğe göre özelleştirilebilir bir Python kütüphanesidir.
 
-*** UYARI ***
-
-`isyatirimhisse`, resmi Is Yatirim Menkul Degerler A.S. kutuphanesi degildir ve sirket tarafindan dogrulanmamistir. Kullanicilar, bu kutuphaneyi kullanmadan once ilgili tum verilere erisim icin Is Yatirim Menkul Degerler A.S. kullanim kosullarini ve haklarini incelemelidir. `isyatirimhisse` kutuphanesi, yalnizca kisisel kullanim amaclari icin tasarlanmistir.
+> :warning: `isyatirimhisse`, resmi İş Yatırım Menkul Değerler A.Ş. kütüphanesi değildir ve şirket tarafından doğrulanmamıştır. Kullanıcılar, bu kütüphaneyi kullanmadan önce ilgili tüm verilere erişim için İş Yatırım Menkul Değerler A.Ş. kullanım koşullarını ve haklarını incelemelidir. `isyatirimhisse` kütüphanesi, yalnızca kişisel kullanım amaçları için tasarlanmıştır.
 
 ## Kurulum
 
-Kutuphaneyi kullanmak icin asagidaki adimlari izleyin:
+Kütüphaneyi kullanmak için aşağıdaki adımları izleyin:
 
-1. Python'i sisteminize yukleyin: https://www.python.org/downloads/
-2. Terminali acin ve paketi yuklemek icin asagidaki komutu calistirin:
+- Python'ı sisteminize yükleyin: https://www.python.org/downloads/
+- Terminali açın ve paketi yüklemek için aşağıdaki komutu çalıştırın:
 
 ```bash
 pip install isyatirimhisse
 ```
 
-## Kullanim
+## Kullanım
 
-### Kutuphanenin Iceri Aktarilmasi
+### Kütüphanenin İçeri Aktarılması
 
 ```python
 from isyatirimhisse import veri_cek
 ```
 
-### Veri Cekme Ornekleri
+### Veri Çekme Örnekleri
 
 ```python
-# Tek hisse, gunluk frekans ve logaritmik getiri
+# Tek hisse, günlük frekans ve logaritmik getiri
 sembol = 'AKBNK'
 baslangic_tarih = '03-01-2023'
 bitis_tarih = '21-07-2023'
@@ -55,7 +53,7 @@ print(veriler)
 ```
 
 ```python
-# Bitis tarihi yok
+# Bitiş tarihi yok
 sembol = 'AKBNK'
 baslangic_tarih = '03-01-2023'
 frekans = '1g'
@@ -78,7 +76,7 @@ print(veriler)
 ```
 
 ```python
-# Birden fazla hisse, haftalik frekans, basit getiri ve NA kaldir
+# Birden fazla hisse, haftalık frekans, basit getiri ve NA kaldır
 sembol = ['AKBNK','EUPWR']
 baslangic_tarih = '03-01-2023'
 bitis_tarih = '21-07-2023'
@@ -103,7 +101,7 @@ print(veriler)
 ```
 
 ```python
-# Birden fazla hisse, aylik frekans, kapanis fiyati ve NA birak
+# Birden fazla hisse, aylık frekans, kapanış fiyatı ve NA bırak
 sembol = ['AKBNK','EUPWR']
 baslangic_tarih = '03-01-2023'
 bitis_tarih = '21-07-2023'
@@ -128,7 +126,7 @@ print(veriler)
 ```
 
 ```python
-# Birden fazla hisse, yillik frekans, kapanis fiyati, ortalama fiyatlar ve NA kaldir
+# Birden fazla hisse, yıllık frekans, kapanış fiyatı, ortalama fiyatlar ve NA kaldır
 sembol = ['AKBNK','EUPWR']
 baslangic_tarih = '03-01-2023'
 bitis_tarih = '21-07-2023'
@@ -154,41 +152,41 @@ print(veriler)
 
 ### Fonksiyon Parametreleri
 
-* `sembol` (str veya list, varsayilan None): Hisse senedi sembolu veya sembollerinin listesi (Orn. 'AKBNK' veya ['AKBNK','EUPWR'])
-* `baslangic_tarih` (str, 'GG-AA-YYYY', varsayilan None): Verilerin baslangic tarihi (Orn. '03-01-2023').
-* `bitis_tarih` (str, 'GG-AA-YYYY', varsayilan None): Verilerin bitis tarihi (Orn. '21-07-2023'). Eger belirtilmezse, sistem tarihini (bugunku tarihi) otomatik olarak kullanir.
-* `frekans` (str, varsayilan '1g'): Veri frekansi (Gunluk: '1g', Haftalik: '1h', Aylik: '1a', Yillik: '1y').
-* `gozlem` (str, varsayilan 'son'): Haftalik, aylik ve yillik frekanslarda istenen gozlem ('son': Son, 'ortalama': Ortalama)
-* `getiri_hesapla` (bool, varsayilan True): Getiri hesaplanacak mi?
+* `sembol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (Örn. 'AKBNK' veya ['AKBNK','EUPWR'])
+* `baslangic_tarih` (str, 'GG-AA-YYYY', varsayılan None): Verilerin başlangıç tarihi (Örn. '03-01-2023').
+* `bitis_tarih` (str, 'GG-AA-YYYY', varsayılan None): Verilerin bitiş tarihi (Örn. '21-07-2023'). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
+* `frekans` (str, varsayılan '1g'): Veri frekansı (Günlük: '1g', Haftalık: '1h', Aylık: '1a', Yıllık: '1y').
+* `gozlem` (str, varsayılan 'son'): Haftalık, aylık ve yıllık frekanslarda istenen gözlem ('son': Son, 'ortalama': Ortalama)
+* `getiri_hesapla` (bool, varsayılan True): Getiri hesaplanacak mı?
 * `logaritmik_getiri` (bool, varsayilan True): Logaritmik getiri mi hesaplanacak?
-* `na_kaldir` (bool, varsayilan True): Eksik degerler kaldirilacak mi?
+* `na_kaldir` (bool, varsayilan True): Eksik değerler kaldırılacak mı?
 
-### Donen Deger
+### Dönen Değer
 
-`veri_cek` fonksiyonu bir pandas DataFrame dondurur.
+`veri_cek` fonksiyonu bir pandas DataFrame döndürür.
 
 ## Notlar
 
-* Kutuphane, Is Yatirim'in web sitesindeki verilere bagimlidir. Bu nedenle, verilerin dogrulugu ve surekliligi icin lutfen ilgili web sitesini kontrol edin: [Is Yatirim](https://www.isyatirim.com.tr/tr-tr/Sayfalar/default.aspx)
-* Kutuphanenin gelistirilmesi ve iyilestirilmesi icin geri bildirimlerinizi bekliyorum. GitHub reposuna katkida bulunun: [GitHub Repo](https://github.com/urazakgul/isyatirimhisse)
-* Herhangi bir sorun veya oneride lutfen GitHub reposundaki "Issue" bolumunden yeni bir konu acarak bildirim saglayin: [GitHub Issues](https://github.com/urazakgul/isyatirimhisse/issues)
+* Kütüphane, İş Yatırım'ın web sitesindeki verilere bağlıdır. Bu nedenle, verilerin doğruluğu ve sürekliliği için lütfen ilgili web sitesini kontrol edin: [İş Yatırım](https://www.isyatirim.com.tr/tr-tr/Sayfalar/default.aspx)
+* Kütüphanenin geliştirilmesi ve iyileştirilmesi için geri bildirimlerinizi bekliyorum. GitHub reposuna katkıda bulunun: [GitHub Repo](https://github.com/urazakgul/isyatirimhisse)
+* Herhangi bir sorun veya öneride lütfen GitHub reposundaki "Issue" bölümünden yeni bir konu açarak bildirim sağlayın: [GitHub Issues](https://github.com/urazakgul/isyatirimhisse/issues)
 
-## Degisiklikler
+## Değişiklikler
 
 ### v0.1.0 - 25/07/2023
 
-* Ilk surum yayinlandi.
+* İlk sürüm yayınlandı.
 
 ### v0.1.1 - 27/07/2023
 
-* `veri_cek` fonksiyonundaki parametreleri kontrol eden kosul ifadeleri guncellendi.
-* `json` kutuphanesi kaldirildi.
-* `veri_cek` fonksiyonuna `200` HTTP kodu kosul ile beraber eklendi ve takibe alindi.
+* `veri_cek` fonksiyonundaki parametreleri kontrol eden koşul ifadeleri güncellendi.
+* `json` kütüphanesi kaldırıldı.
+* `veri_cek` fonksiyonuna `200` HTTP kodu koşul ile beraber eklendi ve takibe alındı.
 
 ## Lisans
 
-Bu proje MIT Lisansi altinda lisanslanmistir.
+Bu kütüphane, MIT lisansı altında lisanslanmıştır.
 
-## Katkida Bulunanlar
+## Katkıda Bulunanlar
 
-- [Sinan Erdinc](https://github.com/sinanerdinc)
+- [Sinan Erdinç](https://github.com/sinanerdinc)
