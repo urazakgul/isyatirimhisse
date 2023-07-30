@@ -22,6 +22,7 @@ def test_veri_cek():
     getiri_hesapla = True
     logaritmik_getiri = True
     na_kaldir = True
+    excel_kaydet = True
 
     veriler = veri_cek(
         sembol=sembol,
@@ -31,7 +32,8 @@ def test_veri_cek():
         gozlem=gozlem,
         getiri_hesapla=getiri_hesapla,
         logaritmik_getiri=logaritmik_getiri,
-        na_kaldir=na_kaldir
+        na_kaldir=na_kaldir,
+        excel_kaydet=excel_kaydet
     )
 
     assert isinstance(veriler, pd.DataFrame), "Veri çekme fonksiyonu DataFrame dönmeli."
@@ -46,6 +48,8 @@ def test_veri_cek():
     getiri_hesapla = True
     logaritmik_getiri = True
     na_kaldir = True
+    excel_kaydet = True
+    excel_dosya_ismi = 'test_veri.xlsx'
 
     veriler = veri_cek(
         sembol=sembol,
@@ -54,11 +58,14 @@ def test_veri_cek():
         gozlem=gozlem,
         getiri_hesapla=getiri_hesapla,
         logaritmik_getiri=logaritmik_getiri,
-        na_kaldir=na_kaldir
+        na_kaldir=na_kaldir,
+        excel_kaydet=excel_kaydet,
+        excel_dosya_ismi=excel_dosya_ismi
     )
 
     assert isinstance(veriler, pd.DataFrame), "Veri çekme fonksiyonu DataFrame dönmeli."
     assert len(veriler) > 0, "Veri çekme fonksiyonu boş DataFrame döndü."
+    assert os.path.exists(excel_dosya_ismi), "Excel dosyası kaydedilmedi."
 
     # Test senaryosu 3: Birden fazla hisse, haftalık frekans, basit getiri ve NA kaldır
     sembol = ['AKBNK', 'EUPWR']
@@ -69,6 +76,8 @@ def test_veri_cek():
     getiri_hesapla = True
     logaritmik_getiri = False
     na_kaldir = True
+    excel_kaydet = True
+    excel_dosya_ismi = 'test_veri.xlsx'
 
     veriler = veri_cek(
         sembol=sembol,
@@ -78,11 +87,14 @@ def test_veri_cek():
         gozlem=gozlem,
         getiri_hesapla=getiri_hesapla,
         logaritmik_getiri=logaritmik_getiri,
-        na_kaldir=na_kaldir
+        na_kaldir=na_kaldir,
+        excel_kaydet=excel_kaydet,
+        excel_dosya_ismi=excel_dosya_ismi
     )
 
     assert isinstance(veriler, pd.DataFrame), "Veri çekme fonksiyonu DataFrame dönmeli."
     assert len(veriler) > 0, "Veri çekme fonksiyonu boş DataFrame döndü."
+    assert os.path.exists(excel_dosya_ismi), "Excel dosyası kaydedilmedi."
 
     # Test senaryosu 4: Birden fazla hisse, aylık frekans, kapanış fiyatı ve NA bırak
     sembol = ['AKBNK', 'EUPWR']
@@ -93,6 +105,8 @@ def test_veri_cek():
     getiri_hesapla = False
     logaritmik_getiri = True
     na_kaldir = False
+    excel_kaydet = True
+    excel_dosya_ismi = 'test_veri.xlsx'
 
     veriler = veri_cek(
         sembol=sembol,
@@ -102,11 +116,14 @@ def test_veri_cek():
         gozlem=gozlem,
         getiri_hesapla=getiri_hesapla,
         logaritmik_getiri=logaritmik_getiri,
-        na_kaldir=na_kaldir
+        na_kaldir=na_kaldir,
+        excel_kaydet=excel_kaydet,
+        excel_dosya_ismi=excel_dosya_ismi
     )
 
     assert isinstance(veriler, pd.DataFrame), "Veri çekme fonksiyonu DataFrame dönmeli."
     assert len(veriler) > 0, "Veri çekme fonksiyonu boş DataFrame döndü."
+    assert os.path.exists(excel_dosya_ismi), "Excel dosyası kaydedilmedi."
 
     # Test senaryosu 5: Birden fazla hisse, yıllık frekans, kapanış fiyatları, ortalama fiyatlar ve NA kaldır
     sembol = ['AKBNK', 'EUPWR']

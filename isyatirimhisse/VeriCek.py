@@ -2,8 +2,9 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import os
 
-def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', gozlem='son', getiri_hesapla=True, logaritmik_getiri=True, na_kaldir=True):
+def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', gozlem='son', getiri_hesapla=True, logaritmik_getiri=True, na_kaldir=True, excel_kaydet=False, excel_dosya_ismi=None):
     """
     Belirtilen tarih aralığında, belirtilen hisse senedi sembolleri için veri çeker. Çıktı özelleştirilebilir.
 
@@ -17,6 +18,9 @@ def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', 
         getiri_hesapla (bool, varsayılan True): Getiri hesaplanacak mı?
         logaritmik_getiri (bool, varsayılan True): Logaritmik getiri mi hesaplanacak?
         na_kaldir (bool, varsayılan True): Eksik değerler kaldırılacak mı?
+        excel_kaydet (bool, varsayılan False): pandas DataFrame Excel dosyasına kaydedilsin mi?
+        excel_dosya_ismi (str, varsayılan None): Kaydedilecek Excel dosyasının ismi (örn. 'veriler.xlsx').
+            Geçerli bir dosya adı belirtilmezse, varsayılan olarak 'veriler.xlsx' kullanılır.
 
     Dönen değer:
         pandas.DataFrame: İstenilen tarih aralığındaki hisse senedi verileri ve gerekirse getiri değerleri içeren DataFrame.
@@ -76,5 +80,20 @@ def veri_cek(sembol=None, baslangic_tarih=None, bitis_tarih=None, frekans='1g', 
         df_final = df_final.dropna()
 
     df_final = df_final.reset_index()
+
+    if excel_kaydet:
+        if not excel_dosya_ismi or excel_dosya_ismi is None:
+            excel_bitis_tarih = datetime.now().strftime('%Y%m%d')
+            excel_dosya_ismi = f'veriler_{excel_bitis_tarih}.xlsx'
+        else:
+            dosya_ismi, dosya_uzantisi = os.path.splitext(excel_dosya_ismi)
+            if not dosya_uzantisi:
+                excel_dosya_ismi += '.xlsx'
+            i = 1
+            while os.path.exists(excel_dosya_ismi):
+                excel_dosya_ismi = f'{dosya_ismi}_{i}{dosya_uzantisi}'
+                i += 1
+
+        df_final.to_excel(excel_dosya_ismi, index=False)
 
     return df_final
