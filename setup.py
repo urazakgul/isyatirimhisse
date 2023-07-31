@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding = "utf-8") as fh:
+    long_description = fh.read()
+    
 setup(
     name="isyatirimhisse",
     version="0.2.0",
@@ -7,7 +10,7 @@ setup(
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
     description="İş Yatırım'ın web sitesinden veri çekme işlemlerini kolaylaştıran ve isteğe göre özelleştirilebilen bir kütüphane.",
-    long_description=open('README.md').read(),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/urazakgul/isyatirimhisse",
     license="MIT",
