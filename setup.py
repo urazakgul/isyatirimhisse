@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding = "utf-8") as fh:
     long_description = fh.read()
-    
+
 setup(
     name="isyatirimhisse",
-    version="0.2.0",
+    version="0.2.1",
     packages=find_packages(),
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
@@ -20,7 +20,6 @@ setup(
         "numpy",
         "matplotlib",
         "seaborn",
-        "os",
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
