@@ -5,7 +5,7 @@ with open("README.md", "r", encoding = "utf-8") as fh:
 
 setup(
     name="isyatirimhisse",
-    version="0.2.1",
+    version="1.0.0",
     packages=find_packages(),
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
@@ -20,6 +20,9 @@ setup(
         "numpy",
         "matplotlib",
         "seaborn",
+        "selenium",
+        "webdriver_manager",
+        "beautifulsoup4",
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
