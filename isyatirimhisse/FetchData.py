@@ -3,7 +3,6 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
-#import time 
 from dateutil.relativedelta import relativedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -205,12 +204,10 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
     for sym in symbol:
         url = f'https://www.isyatirim.com.tr/tr-tr/analiz/hisse/Sayfalar/sirket-karti.aspx?hisse={sym}'
         driver.get(url)
-        #time.sleep(3) zaten webdriverwait ile bekletiyoruz ihtiyaç olmadığını düşünüyorum.
         financial_statements_tab = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Mali Tablolar')]"))
         )
         financial_statements_tab.click()
-        #time.sleep(3) altta first_select_box için de webdriver ekledim.
 
         start_date = datetime.strptime(start_period, '%Y/%m')
         end_date = datetime.strptime(end_period, '%Y/%m')
@@ -221,7 +218,6 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
             desired_dates.append(datetime(start_date.year, quarter * 3, 1).date())
             start_date += relativedelta(months=3)
 
-        #first_select_box = driver.find_element(By.XPATH, "//span[@id='select2-ddlMaliTabloDonem1-container']")
         first_select_box = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//span[@id='select2-ddlMaliTabloDonem1-container']"))
         )
@@ -238,13 +234,10 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
             )
             driver.execute_script("arguments[0].scrollIntoView();", select_box)
             select_box.click()
-            #time.sleep(3) artık ihtiyaç yok
             select_box_item = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, f"//li[contains(@id, 'select2-ddlMaliTabloDonem1') and .//text()='{date}']"))
             )
-            #select_box_item = driver.find_element(By.XPATH, f"//li[contains(@id, 'select2-ddlMaliTabloDonem1') and .//text()='{date}']")
             select_box_item.click()
-            #time.sleep(3) ihtiyaç yok
 
             page_source = driver.page_source
 
