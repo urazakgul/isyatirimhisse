@@ -23,6 +23,7 @@ setup(
         "selenium",
         "webdriver_manager",
         "beautifulsoup4",
+        "openpyxl",
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
