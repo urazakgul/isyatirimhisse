@@ -218,7 +218,13 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
         symbol = [symbol]
 
     data_dict = {}
+    
+    desired_dates = []
 
+    while start_period <= end_period:
+        quarter = (start_period.month - 1) // 3 + 1
+        desired_dates.append(datetime(start_period.year, quarter * 3, 1).date())
+        start_period += relativedelta(months=3)
     for sym in symbol:
         url = f'https://www.isyatirim.com.tr/tr-tr/analiz/hisse/Sayfalar/sirket-karti.aspx?hisse={sym}'
         driver.get(url)
@@ -226,13 +232,7 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
             EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Mali Tablolar')]"))
         )
         financial_statements_tab.click()
-
-        desired_dates = []
-        while start_period <= end_period:
-            quarter = (start_period.month - 1) // 3 + 1
-            desired_dates.append(datetime(start_period.year, quarter * 3, 1).date())
-            start_period += relativedelta(months=3)
-
+        
         first_select_box = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//span[@id='select2-ddlMaliTabloDonem1-container']"))
         )
