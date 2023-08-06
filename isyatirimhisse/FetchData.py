@@ -13,6 +13,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 
+def date_conversion_decorator(func):
+    def wrapper(symbol=None, start_period=None, end_period=None, save_to_excel=False, language='en'):
+        if start_period:
+            start_date = datetime.strptime(start_period, '%Y/%m')
+        else:
+            start_date = None
+        
+        if end_period:
+            end_date = datetime.strptime(end_period, '%Y/%m')
+        else:
+            end_date = None
+        
+        return func(symbol, start_date, end_date, save_to_excel, language)
+    
+    return wrapper
+
+
 def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', currency='TL'):
 
     column_labels = {
@@ -127,6 +144,7 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
 
     return df_final
 
+@date_conversion_decorator
 def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_excel=False, language='en'):
 
     translations_tr = {
@@ -200,7 +218,13 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
         symbol = [symbol]
 
     data_dict = {}
+    
+    desired_dates = []
 
+    while start_period <= end_period:
+        quarter = (start_period.month - 1) // 3 + 1
+        desired_dates.append(datetime(start_period.year, quarter * 3, 1).date())
+        start_period += relativedelta(months=3)
     for sym in symbol:
         url = f'https://www.isyatirim.com.tr/tr-tr/analiz/hisse/Sayfalar/sirket-karti.aspx?hisse={sym}'
         driver.get(url)
@@ -208,16 +232,7 @@ def fetch_financials(symbol=None, start_period=None, end_period=None, save_to_ex
             EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Mali Tablolar')]"))
         )
         financial_statements_tab.click()
-
-        start_date = datetime.strptime(start_period, '%Y/%m')
-        end_date = datetime.strptime(end_period, '%Y/%m')
-
-        desired_dates = []
-        while start_date <= end_date:
-            quarter = (start_date.month - 1) // 3 + 1
-            desired_dates.append(datetime(start_date.year, quarter * 3, 1).date())
-            start_date += relativedelta(months=3)
-
+        
         first_select_box = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//span[@id='select2-ddlMaliTabloDonem1-container']"))
         )
