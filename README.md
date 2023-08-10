@@ -1,4 +1,4 @@
-# isyatirimhisse v1.0.0
+# isyatirimhisse v2.0.0
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==1.0.0
+pip install isyatirimhisse==2.0.0
 ```
 
 ## Kullanım
@@ -38,7 +38,7 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 ### Tanımlar
 
 * `fetch_data`: Belirtilen hisse senetlerine ait verileri alır.
-* `fetch_financials`: Belirtilen hisse senetlerine ait finansal tabloları (Bilanço, Gelir Tablosu, Dipnot ve Nakit Akım Tablosu) alır.
+* `fetch_financials`: Belirtilen hisse senetlerine ait finansal tabloları alır.
 * `visualize_data`: Belirtilen hisse senetlerine ait verileri görselleştirir.
 
 ### Fonksiyon Parametreleri ve Örnekler
@@ -46,8 +46,8 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 #### `fetch_data`
 
 * `symbol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
-* `start_date` (str, varsayılan None): Verilerin başlangıç tarihi, 'GG-AA-YYYY' (örn. `'03-01-2023'`).
-* `end_date` (str, varsayılan None): Verilerin bitiş tarihi, 'GG-AA-YYYY' (örn. `'31-07-2023'`). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
+* `start_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında başlangıç tarihi (örn. `'03-01-2023'`).
+* `end_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında bitiş tarihi (örn. `'31-07-2023'`). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
 * `frequency` (str, varsayılan '1d'): Veri frekansı (`'1d'`: Günlük, `'1w'`: Haftalık, `'1m'`: Aylık, `'1y'`: Yıllık).
 * `observation` (str, varsayılan 'last'): Haftalık, aylık ve yıllık frekanslarda istenen gözlem (`'last'`: Son, `'mean'`: Ortalama).
 * `calculate_return` (bool, varsayılan False): Getiri hesaplanacak mı?
@@ -56,7 +56,7 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 * `save_to_excel` (bool, varsayılan False): Excel dosyasına kaydedilecek mi?
 * `excel_file_name` (str, varsayılan None): Kaydedilecek excel dosyasının ismi (örn. 'data.xlsx' veya 'data'). Geçerli bir dosya ismi belirtilmezse, sistem tarihi kullanılarak 'data_YYYYMMDD.xlsx' ismiyle kaydedilir. Eğer kaydedilecek dizinde aynı isimden başka bir dosya varsa farklı bir isimle kaydeder.
 * `language` (str, varsayılan 'en'): Çıktıların dili (`'tr'`: Türkçe, `'en'`: İngilizce).
-* `currency` (str, varsayılan 'TL'): Hisse senedi fiyatları için para birimi (`'TL'`: Türk Lirası, `'USD'`: ABD Doları).
+* `exchange` (str, varsayılan 'TL'): Hisse senedi fiyatları için para birimi (`'TL'`: Türk Lirası, `'USD'`: ABD Doları).
 
 `fetch_data` fonksiyonu bir pandas veri çerçevesi döndürür.
 
@@ -65,7 +65,7 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 symbol='GARAN'
 start_date='03-01-2023'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date
 )
@@ -78,7 +78,7 @@ start_date='03-01-2023'
 frequency='1w'
 observation='mean'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     frequency=frequency,
@@ -94,16 +94,16 @@ end_date='30-12-2022'
 frequency='1m'
 calculate_return=True
 log_return=False
-currency='USD'
+exchange='USD'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     end_date=end_date,
     frequency=frequency,
     calculate_return=calculate_return,
     log_return=log_return,
-    currency=currency
+    exchange=exchange
 )
 ```
 
@@ -116,10 +116,10 @@ frequency='1y'
 drop_na=False
 save_to_excel=True
 language='tr'
-currency='USD'
+exchange='USD'
 
 # Not: Örnekte bulunan EUPWR hisse senedinin 2023 yılı öncesi verileri olmadığı için çıktıda görünmeyecektir.
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     end_date=end_date,
@@ -127,68 +127,74 @@ data = fetch_data(
     drop_na=drop_na,
     save_to_excel=save_to_excel,
     language=language,
-    currency=currency
+    exchange=exchange
 )
 ```
 
 #### `fetch_financials`
 
 * `symbol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
-* `start_period` (str, varsayılan None): Finansal tabloların başlangıç dönemi, 'YYYY/Ç' (örn. `'2022/3'`).
-* `end_period` (str, varsayılan None): Finansal tabloların bitiş dönemi, 'YYYY/Ç' (örn. `'2022/12'`).
+* `start_year` (str, varsayılan None): Finansal tabloların YYYY formatında başlangıç yılı (örn. `'2022'`).
+* `end_year` (str, varsayılan None): Finansal tabloların YYYY formatında bitiş yılı (örn. `'2023'`).
+* `exchange` (str, varsayılan 'TRY'): Finansal tablolar için para birimi (`'TRY'`: Türk Lirası, `'USD'`: ABD Doları).
+* `financial_group` (str, varsayılan '1'): Finansal tablo türü (`'1'`: Seri XI NO:29, `'2'`: Konsolide Olmayan UFRS, `'3'`: Konsolide UFRS).
 * `save_to_excel` (bool, varsayılan False): Excel dosyasına kaydedilecek mi?
 * `language` (str, varsayılan 'en'): Çıktıların dili (`'tr'`: Türkçe, `'en'`: İngilizce).
 
-`fetch_financials` fonksiyonu bir sözlük döndürür. Sözlük, belirtilen her bir sembolün bilanço (`bilanco`), gelir tablosu (`gelir_tablosu`), dipnot (`dipnot`) ve nakit akış tablosunu (`nakit_akis_tablosu`) içerir.
-
-`fetch_financials` fonksiyonu Chrome tabanlı çalışmaktadır.
+`fetch_financials` fonksiyonu bir sözlük döndürür.
 
 ```python
 # Örnek 1: Tek bir hisse senedi için finansal tabloları çek ve dili Türkçe olarak ayarlayıp excel dosyasına kaydet.
-symbol='AKBNK'
-start_period='2022/3'
-end_period='2023/3'
+symbol='THYAO'
+start_year='2022'
+end_year='2023'
 save_to_excel=True
 language='tr'
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbol,
-    start_period=start_period,
-    end_period=end_period,
+    start_year=start_year,
+    end_year=end_year,
     save_to_excel=save_to_excel,
     language=language
 )
 ```
 
 ```python
-# Örnek 2: Birden fazla hisse senedi için finansal tabloları çek.
-symbols = ['AKBNK', 'THYAO']
-start_period = '2022/3'
-end_period = '2023/3'
+# Örnek 2: Birden fazla hisse senedi için konsolide olmayan UFRS'ye göre finansal tabloları çek.
+symbols=['AKBNK', 'THYAO']
+start_year='2022'
+end_year='2023'
+financial_group='2'
+language='tr'
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbols,
-    start_period=start_period,
-    end_period=end_period
+    start_year=start_year,
+    end_year=end_year,
+    financial_group=financial_group,
+    language=language
 )
 ```
 
 ```python
-# Örnek 3: Belirtilen birden fazla hisse senedi için finansal tabloları al ve örnek bir hisse senedine ait bilançoya Türkçe kullanarak ulaş.
-symbols = ['AKBNK', 'THYAO']
-start_period = '2022/3'
-end_period = '2023/3'
+# Örnek 3: Belirtilen birden fazla hisse senedi için USD bazlı finansal tabloları al ve örnek bir hisse senedine ait finansal tablolara Türkçe kullanarak ulaş.
+symbols=['AKBNK', 'THYAO']
+start_year='2018'
 language='tr'
+exchange='USD'
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbols,
-    start_period=start_period,
-    end_period=end_period,
-    language=language
+    start_year=start_year,
+    language=language,
+    exchange=exchange
 )
 
-# Örnekte bulunan THYAO hisse senedinin bilanço verileri
-thyao_bilanco = data['THYAO']['bilanco']
+# Örnekte bulunan THYAO hisse senedinin finansal tabloları
+thyao_finansallar=data['THYAO']
+
+# İstenen hisse senedine ait finansal tablolar gelmiyorsa veri kaynağı belirtilen financial_group parametresi değerine ait tabloyu yayınlamamıştır.
 ```
 
 #### `visualize_data`
@@ -218,7 +224,7 @@ thyao_bilanco = data['THYAO']['bilanco']
 `visualize_data` fonksiyonu, pandas veri çerçevesi içerisindeki verileri grafikler ve görsel öğelerle temsil eder.
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS'],
     start_date='01-01-2013',
     end_date='31-07-2023'
@@ -238,7 +244,7 @@ visualize_data(
 ![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_1.png?raw=true)
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS'],
     start_date='01-12-2012',
     end_date='31-07-2023',
@@ -257,7 +263,7 @@ visualize_data(
 ![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_2.png?raw=true)
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN'],
     start_date='01-12-2012',
     end_date='31-07-2023',
@@ -316,6 +322,15 @@ visualize_data(
 * `visualize_data` fonksiyonuna ekstra özellik ekleyebilmeyi sağlayan **kwargs parametreleri genişletildi.
 * Dokümantasyon içeriği Türkçe ve İngilizce olacak şekilde güncellendi.
 
+### v2.0.0 - 10/08/2023
+
+* `fetch_data` fonksiyonundaki `currency` parametresi `exchange` olarak değiştirildi.
+* `fetch_financials` fonksiyonundaki `selenium` paketi bağımlılığı kaldırıldı.
+* `fetch_financials` fonksiyonu ile finansal tablolar tek bir tablo olarak alınacak şekilde güncellendi.
+* `fetch_financials` fonksiyonundaki `start_period` ve `end_period` parametreleri sırasıyla `start_year` ve `end_year` olarak güncellendi.
+* `fetch_financials` fonksiyonuna `exchange` ve `financial_group` parametreleri eklendi.
+* `fetch_data` ve `fetch_financials` fonksiyonlarındaki kontroller artırıldı.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -323,6 +338,8 @@ Bu proje MIT Lisansı altında lisanslanmıştır.
 ## Katkıda Bulunanlar
 
 - [Sinan Erdinç](https://github.com/sinanerdinc)
+- [Tugay Şengel](https://github.com/Brigade45)
+- [Anıl Öz](https://twitter.com/hocestnonsatis)
 
 ## For those who prefer English:
 
@@ -348,7 +365,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==1.0.0
+pip install isyatirimhisse==2.0.0
 ```
 
 ## Usage
@@ -362,7 +379,7 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 ### Definitions
 
 * `fetch_data`: Fetches data for the specified stocks.
-* `fetch_financials`: Fetches financial statements (Balance Sheet, Income Statement, Footnotes, and Cash Flow Statement) for the specified stocks.
+* `fetch_financials`: Fetches financial statements for the specified stocks.
 * `visualize_data`: Visualizes the data for the specified stocks.
 
 ### Function Parameters and Examples
@@ -380,7 +397,7 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 * `save_to_excel` (bool, default False): Will it be saved in excel file?
 * `excel_file_name` (str, default None): The name of the excel file to save to (e.g. 'data.xlsx' or 'data'). If no valid file name is specified, it will be saved as 'data_YYYYMMDD.xlsx' using the system date. If there is another file with the same name in the directory to be saved, it will save with a different name.
 * `language` (str, default 'en'): The language of the output (`'tr'`: Turkish, `'en'`: English).
-* `currency` (str, default 'TL'): Currency for stock prices (`'TL'`: Turkish Lira, `'USD'`: US Dollar).
+* `exchange` (str, default 'TL'): Exchange for stock prices (`'TL'`: Turkish Lira, `'USD'`: US Dollar).
 
 The `fetch_data` function returns a pandas data frame.
 
@@ -389,7 +406,7 @@ The `fetch_data` function returns a pandas data frame.
 symbol='GARAN'
 start_date='03-01-2023'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date
 )
@@ -402,7 +419,7 @@ start_date='03-01-2023'
 frequency='1w'
 observation='mean'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     frequency=frequency,
@@ -418,16 +435,16 @@ end_date='30-12-2022'
 frequency='1m'
 calculate_return=True
 log_return=False
-currency='USD'
+exchange='USD'
 
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     end_date=end_date,
     frequency=frequency,
     calculate_return=calculate_return,
     log_return=log_return,
-    currency=currency
+    exchange=exchange
 )
 ```
 
@@ -439,75 +456,77 @@ end_date='30-12-2022'
 frequency='1y'
 drop_na=False
 save_to_excel=True
-currency='USD'
+exchange='USD'
 
 # Note: The EUPWR stock in the example will not appear in the output because it has no data before 2023.
-data = fetch_data(
+data=fetch_data(
     symbol=symbol,
     start_date=start_date,
     end_date=end_date,
     frequency=frequency,
     drop_na=drop_na,
     save_to_excel=save_to_excel,
-    currency=currency
+    exchange=exchange
 )
 ```
 
 #### `fetch_financials`
 
 * `symbol` (str or list, default None): Stock symbol or list of symbols (e.g. `'AKBNK'` or `['AKBNK','THYAO']`).
-* `start_period` (str, default None): Start period of the financial statements in 'YYYY/Q' format (e.g. `'2022/3'`).
-* `end_period` (str, default None): End period of the financial statements in 'YYYY/Q' format (e.g. `'2022/12'`).
+* `start_year` (str, default None): Start year of the financial statements in 'YYYY' format (e.g. `'2022'`).
+* `end_year` (str, default None): End year of the financial statements in 'YYYY' format (e.g. `'2023'`).
+* `exchange` (str, default 'TRY'): Exchange for financial statements (`'TRY'`: Turkish Lira, `'USD'`: US Dollar).
+* `financial_group` (str, default '1'): Type of financial statement (`'1'`: Series XI NO:29, `'2'`: Non-Consolidated IFRS, `'3'`: Consolidated IFRS).
 * `save_to_excel` (bool, default False): Will it be saved in excel file?
 * `language` (str, default 'en'): Language of the outputs (`'tr'`: Turkish, `'en'`: English).
 
-The `fetch_financials` function returns a dictionary. The dictionary contains the balance sheet (`balance_sheet`), income statement (`income_statement`), footnote (`footnote`) and cash flow statement (`cash_flow_statement`) for each specified symbol.
-
-The `fetch_financials` function is based on Chrome.
+The `fetch_financials` function returns a dictionary.
 
 ```python
 # Example 1: Get the financial statements for a single stock, and save to excel file.
-symbol='AKBNK'
-start_period='2022/3'
-end_period='2023/3'
+symbol='THYAO'
+start_year='2022'
+end_year='2023'
 save_to_excel=True
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbol,
-    start_period=start_period,
-    end_period=end_period,
-    save_to_excel=save_to_excel,
-    language=language
+    start_year=start_year,
+    end_year=end_year,
+    save_to_excel=save_to_excel
 )
 ```
 
 ```python
-# Example 2: Get the financial statements for multiple stocks.
-symbols = ['AKBNK', 'THYAO']
-start_period = '2022/3'
-end_period = '2023/3'
+# Example 2: Get the financial statements for multiple stocks according to non-consolidated IFRS.
+symbols=['AKBNK', 'THYAO']
+start_year='2022'
+end_year='2023'
+financial_group='2'
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbols,
-    start_period=start_period,
-    end_period=end_period
+    start_year=start_year,
+    end_year=end_year
 )
 ```
 
 ```python
 # Example 3: Get financial statements for multiple specified stocks and access the balance sheet of a sample stock.
-symbols = ['AKBNK', 'THYAO']
-start_period = '2022/3'
-end_period = '2023/3'
+symbols=['AKBNK', 'THYAO']
+start_year='2022'
+end_year='2023'
 
-data = fetch_financials(
+data=fetch_financials(
     symbol=symbols,
-    start_period=start_period,
-    end_period=end_period
+    start_year=start_year,
+    end_year=end_year
 )
 
-# Accessing the balance sheet data of the THYAO stock in the example
-thyao_balance_sheet = data['THYAO']['balance_sheet']
+# Financial statements of the THYAO stock in the example
+thyao_financials=data['THYAO']
+
+# If the financial statements of the requested stock are not available, the data source has not published the table associated with the specified financial_group parameter.
 ```
 
 #### `visualize_data`
@@ -537,7 +556,7 @@ thyao_balance_sheet = data['THYAO']['balance_sheet']
 The `visualize_data` function represents the data in the pandas data frame with graphs and visual elements.
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS'],
     start_date='01-01-2013',
     end_date='31-07-2023'
@@ -556,7 +575,7 @@ visualize_data(
 ![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_4.png?raw=true)
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS'],
     start_date='01-12-2012',
     end_date='31-07-2023',
@@ -574,7 +593,7 @@ visualize_data(
 ![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_5.png?raw=true)
 
 ```python
-data = fetch_data(
+data=fetch_data(
     symbol=['AKBNK', 'THYAO', 'GARAN'],
     start_date='01-12-2012',
     end_date='31-07-2023',
@@ -632,6 +651,15 @@ visualize_data(
 * Extended **kwargs parameters for the `visualize_data` function to allow adding extra features.
 * Updated documentation content to be available in both Turkish and English.
 
+### v2.0.0 - 10/08/2023
+
+* Changed the `currency` parameter in the `fetch_data` function to `exchange`.
+* Removed the dependency on the `selenium` package from the `fetch_financials` function.
+* Updated the `fetch_financials` function to acquire financial statements as a single table.
+* Renamed the `start_period` and `end_period` parameters in the `fetch_financials` function to `start_year` and `end_year`, respectively.
+* Added new parameters, `exchange` and `financial_group`, to the `fetch_financials` function.
+* Enhanced checks and validations in both the `fetch_data` and `fetch_financials` functions.
+
 ## License
 
 This project is licensed under the MIT License.
@@ -639,3 +667,5 @@ This project is licensed under the MIT License.
 ## Contributors
 
 - [Sinan Erdinç](https://github.com/sinanerdinc)
+- [Tugay Şengel](https://github.com/Brigade45)
+- [Anıl Öz](https://twitter.com/hocestnonsatis)

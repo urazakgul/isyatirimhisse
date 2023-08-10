@@ -1,2 +1,2 @@
-from .VeriCek import veri_cek
-from .VeriGorsel import veri_gorsel
+from .FetchData import fetch_data, fetch_financials
+from .DataViz import visualize_data
