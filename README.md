@@ -1,4 +1,4 @@
-# isyatirimhisse v2.0.0
+# isyatirimhisse v2.1.0
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==2.0.0
+pip install isyatirimhisse==2.1.0
 ```
 
 ## Kullanım
@@ -37,15 +37,16 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 
 ### Tanımlar
 
-* `fetch_data`: Belirtilen hisse senetlerine ait verileri alır.
+* `fetch_data`: Belirtilen hisse senetlerine ve endekslere ait verileri alır.
 * `fetch_financials`: Belirtilen hisse senetlerine ait finansal tabloları alır.
-* `visualize_data`: Belirtilen hisse senetlerine ait verileri görselleştirir.
+* `visualize_data`: Belirtilen hisse senetlerine ait verileri görselleştirir ve `fetch_data` çıktıları ile uyumlu çalışması için tasarlanmıştır.
 
 ### Fonksiyon Parametreleri ve Örnekler
 
 #### `fetch_data`
 
 * `symbol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
+* `stock_market_index` (str veya list, varsayılan None): Endeks sembolü veya sembollerinin listesi (örn. `'XU100'` veya `['XU100','XBANK']`).
 * `start_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında başlangıç tarihi (örn. `'03-01-2023'`).
 * `end_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında bitiş tarihi (örn. `'31-07-2023'`). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
 * `frequency` (str, varsayılan '1d'): Veri frekansı (`'1d'`: Günlük, `'1w'`: Haftalık, `'1m'`: Aylık, `'1y'`: Yıllık).
@@ -121,6 +122,31 @@ exchange='USD'
 # Not: Örnekte bulunan EUPWR hisse senedinin 2023 yılı öncesi verileri olmadığı için çıktıda görünmeyecektir.
 data=fetch_data(
     symbol=symbol,
+    start_date=start_date,
+    end_date=end_date,
+    frequency=frequency,
+    drop_na=drop_na,
+    save_to_excel=save_to_excel,
+    language=language,
+    exchange=exchange
+)
+```
+
+```python
+# Örnek 5: Birden fazla hisse senedine ve endekse ait başlangıç ve bitiş tarihleri belli eksik değerleri kaldırmadan aylık ortalama USD kapanış fiyatlarını al. Ayrıca dosya ismi belirtmeden excel dosyasına kaydet ve çıktıları Türkçe yap.
+symbol=['GARAN','THYAO']
+stock_market_index=['XU030','XBANK']
+start_date='02-01-2012'
+end_date='31-07-2023'
+frequency='1m'
+drop_na=False
+save_to_excel=True
+language='tr'
+exchange='USD'
+
+data=fetch_data(
+    symbol=symbol,
+    stock_market_index=stock_market_index,
     start_date=start_date,
     end_date=end_date,
     frequency=frequency,
@@ -331,6 +357,11 @@ visualize_data(
 * `fetch_financials` fonksiyonuna `exchange` ve `financial_group` parametreleri eklendi.
 * `fetch_data` ve `fetch_financials` fonksiyonlarındaki kontroller artırıldı.
 
+### v2.1.0 - 12/08/2023
+
+* `fetch_data` fonksiyonuna endekslere ait verileri çekmeyi sağlayacak `stock_market_index` parametresi eklenmiştir.
+* `fetch_financials` fonksiyonları ile çekilen finansalların kalemlerinde bulunan boşluklar kaldırılmıştır.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -365,7 +396,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==2.0.0
+pip install isyatirimhisse==2.1.0
 ```
 
 ## Usage
@@ -378,15 +409,16 @@ from isyatirimhisse import fetch_data, fetch_financials, visualize_data
 
 ### Definitions
 
-* `fetch_data`: Fetches data for the specified stocks.
+* `fetch_data`: Fetches data for the specified stocks and indices.
 * `fetch_financials`: Fetches financial statements for the specified stocks.
-* `visualize_data`: Visualizes the data for the specified stocks.
+* `visualize_data`: Visualizes the data for the specified stocks is designed to work with the outputs of `fetch_data`.
 
 ### Function Parameters and Examples
 
 #### `fetch_data`
 
 * `symbol` (str or list, default None): The stock symbol or list of symbols (e.g. `'AKBNK'` or `['AKBNK','THYAO']`).
+* `stock_market_index` (str or list, default None): The index symbol or list of indices (e.g. `'XU100'` or `['XU100','XBANK']`).
 * `start_date` (str, default None): Start date of the data in 'DD-MM-YYYY' format (e.g. `'03-01-2023'`).
 * `end_date` (str, default None): End date of the data in 'DD-MM-YYYY' format (e.g. `31-07-2023`). If not specified, it automatically uses the system date (today's date).
 * `frequency` (str, default '1d'): Data frequency (`'1d'`: Daily, `'1w'`: Weekly, `'1m'`: Monthly, `'1y'`: Yearly).
@@ -461,6 +493,29 @@ exchange='USD'
 # Note: The EUPWR stock in the example will not appear in the output because it has no data before 2023.
 data=fetch_data(
     symbol=symbol,
+    start_date=start_date,
+    end_date=end_date,
+    frequency=frequency,
+    drop_na=drop_na,
+    save_to_excel=save_to_excel,
+    exchange=exchange
+)
+```
+
+```python
+# Example 5: Get the monthly average USD closing prices of multiple stocks and indices without removing missing values with specific start and end dates. Also save to excel file without specifying a filename.
+symbol=['GARAN','THYAO']
+stock_market_index=['XU030','XBANK']
+start_date='02-01-2012'
+end_date='30-12-2022'
+frequency='1m'
+drop_na=False
+save_to_excel=True
+exchange='USD'
+
+data=fetch_data(
+    symbol=symbol,
+    stock_market_index=stock_market_index,
     start_date=start_date,
     end_date=end_date,
     frequency=frequency,
@@ -659,6 +714,11 @@ visualize_data(
 * Renamed the `start_period` and `end_period` parameters in the `fetch_financials` function to `start_year` and `end_year`, respectively.
 * Added new parameters, `exchange` and `financial_group`, to the `fetch_financials` function.
 * Enhanced checks and validations in both the `fetch_data` and `fetch_financials` functions.
+
+### v2.1.0 - 12/08/2023
+
+* Added the `stock_market_index` parameter to the `fetch_data` function to fetch data for specific stock market indices.
+* Removed the spaces in the items of the financials fetched with the `fetch_financials` functions.
 
 ## License
 

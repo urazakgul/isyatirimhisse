@@ -167,6 +167,25 @@ def test_fetch_data_end_date_earlier():
 
     print(data)
 
+# Scenario 10: The compatibility of 'symbol' and 'stock_market_index' parameters
+# @pytest.mark.skip(reason="This test is currently disabled.")
+def test_symbol_stock_market_index_compatibility():
+
+    symbol='GARAN.IS'
+    stock_market_index='XU100'
+    start_date='02-01-2012'
+    end_date='30-12-2021'
+
+    data = fetch_data(
+        stock_market_index=stock_market_index,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    assert len(data) > 0, "No data found."
+
+    print(data)
+
 # Example 1
 # @pytest.mark.skip(reason="This test is currently disabled.")
 def test_fetch_data_example_1():
@@ -244,6 +263,36 @@ def test_fetch_data_example_4():
 
     data = fetch_data(
         symbol=symbol,
+        start_date=start_date,
+        end_date=end_date,
+        frequency=frequency,
+        drop_na=drop_na,
+        save_to_excel=save_to_excel,
+        language=language,
+        exchange=exchange
+    )
+
+    assert len(data) > 0, "No data found."
+
+    print(data)
+
+# Example 5
+# @pytest.mark.skip(reason="This test is currently disabled.")
+def test_fetch_data_example_5():
+
+    # symbol=['GARAN','THYAO']
+    stock_market_index=['XU100','XU030','XBANK']
+    start_date='02-01-2012'
+    end_date='31-07-2023'
+    frequency='1d'
+    drop_na=False
+    save_to_excel=True
+    language='tr'
+    exchange='USD'
+
+    data=fetch_data(
+        # symbol=symbol,
+        stock_market_index=stock_market_index,
         start_date=start_date,
         end_date=end_date,
         frequency=frequency,

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
+def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
 
     column_labels = {
         'tr': {
@@ -17,7 +17,7 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
 
     error_messages = {
         'tr': {
-            'symbol': "Hisse senedi sembolü girilmedi. 'symbol' parametresi zorunludur.",
+            'symbol_smi': "'symbol' veya 'stock_market_index' parametrelerinden biri girilmelidir.",
             'start_date': "Başlangıç tarihi girilmedi. 'start_date' parametresi zorunludur.",
             'start_end_date': "Bitiş tarihi başlangıç tarihinden büyük veya başlangıç tarihine eşit olmalıdır.",
             'date_format': "Tarih formatı GG-AA-YYYY olmalıdır.",
@@ -29,7 +29,7 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
             'response': "Gönderdiğiniz istek İş Yatırım tarafından reddedildi."
         },
         'en': {
-            'symbol': "Stock symbol not provided. The 'symbol' parameter is mandatory.",
+            'symbol_smi': "One of the parameters 'symbol' or 'stock_market_index' must be entered.",
             'start_date': "Start period not provided. The 'start_date' parameter is mandatory.",
             'start_end_date': "End date must be greater than or equal to the start date.",
             'date_format': "Date format must be DD-MM-YYYY.",
@@ -42,13 +42,21 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
         }
     }
 
-    if not symbol or symbol is None:
-        raise KeyError(error_messages[language]['symbol'])
+    if symbol is None and stock_market_index is None:
+        raise KeyError(error_messages[language]['symbol_smi'])
 
-    if not start_date or start_date is None:
+    if symbol is not None:
+        if not isinstance(symbol, list):
+            symbol = [symbol]
+
+    if stock_market_index is not None:
+        if not isinstance(stock_market_index, list):
+            stock_market_index = [stock_market_index]
+
+    if start_date is None:
         raise KeyError(error_messages[language]['start_date'])
 
-    if not end_date or end_date is None:
+    if end_date is None:
         end_date = datetime.now().strftime('%d-%m-%Y')
 
     try:
@@ -61,9 +69,6 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
     end_date_ = datetime.strptime(end_date, "%d-%m-%Y")
     if end_date_ < start_date_:
         raise ValueError(error_messages[language]['start_end_date'])
-
-    if not isinstance(symbol, list):
-        symbol = [symbol]
 
     if not all(isinstance(var, bool) for var in [calculate_return, log_return, drop_na, save_to_excel]):
         raise ValueError(error_messages[language]['check_bool'])
@@ -86,34 +91,73 @@ def fetch_data(symbol=None, start_date=None, end_date=None, frequency='1d', obse
     if language.lower() != "tr" and language.lower() != "en":
         raise KeyError("Geçersiz dil seçeneği. Sadece 'tr' veya 'en' girilmelidir./Invalid language. Only 'tr' or 'en' must be entered.")
 
-    data_list = []
+    if symbol is not None:
+        symbol_data_list = []
 
-    for s in symbol:
-        url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
-        url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
-        res = requests.get(url)
-        if not res.status_code == 200:
-            raise ConnectionError(error_messages[language]['response'])
-        result = res.json()
-        if result['value']:
-            historical = (
-                pd.DataFrame(result['value'])
-                .loc[:, ['HGDG_TARIH', closing_column]]
-                .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{s}'})
-            )
-            data_list.append(historical)
+        for s in symbol:
+            url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
+            url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
+            res = requests.get(url)
+            if not res.status_code == 200:
+                raise ConnectionError(error_messages[language]['response'])
+            result = res.json()
+            if result['value']:
+                historical = (
+                    pd.DataFrame(result['value'])
+                    .loc[:, ['HGDG_TARIH', closing_column]]
+                    .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{s}'})
+                )
+                symbol_data_list.append(historical)
 
-    if not data_list:
-        raise ValueError(error_messages[language]['data'])
+        if not symbol_data_list:
+            raise ValueError(error_messages[language]['data'])
 
-    df_final = data_list[0]
-    for i in range(1, len(data_list)):
-        df_final = pd.merge(df_final, data_list[i], on=column_labels[language]['date'], how='outer')
+        df_symbol_final = symbol_data_list[0]
+        for i in range(1, len(symbol_data_list)):
+            df_symbol_final = pd.merge(df_symbol_final, symbol_data_list[i], on=column_labels[language]['date'], how='outer')
 
-    df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']], format='%d-%m-%Y').dt.strftime('%Y-%m-%d')
-    df_final.dtypes
-    df_final = df_final.set_index(column_labels[language]['date'])
-    df_final.index = pd.to_datetime(df_final.index)
+        df_symbol_final[column_labels[language]['date']] = pd.to_datetime(df_symbol_final[column_labels[language]['date']], format='%d-%m-%Y').dt.strftime('%Y-%m-%d')
+        df_symbol_final = df_symbol_final.set_index(column_labels[language]['date'])
+        df_symbol_final.index = pd.to_datetime(df_symbol_final.index)
+
+    if stock_market_index is not None:
+        smi_data_list = []
+
+        smi_start_date = start_date[-4:] + start_date[3:5] + start_date[:2]
+        smi_end_date = end_date[-4:] + end_date[3:5] + end_date[:2]
+
+        for smi in stock_market_index:
+            url = f"https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll?period=1440"
+            url += f"&from={smi_start_date}000000&to={smi_end_date}235959&endeks={smi}.I.BIST"
+            res = requests.get(url)
+            if not res.status_code == 200:
+                raise ConnectionError(error_messages[language]['response'])
+            result = res.json()
+            if result['data']:
+                historical = (
+                    pd.DataFrame(result['data'])
+                    .rename(columns={0: column_labels[language]['date'], 1: f'{smi}'})
+                )
+                historical[column_labels[language]['date']] = pd.to_datetime(historical[column_labels[language]['date']] / 1000, unit='s') + pd.to_timedelta(3, unit='h')
+                historical[column_labels[language]['date']] = historical[column_labels[language]['date']].dt.strftime('%Y-%m-%d')
+                smi_data_list.append(historical)
+
+        if not smi_data_list:
+            raise ValueError(error_messages[language]['data'])
+
+        df_smi_final = smi_data_list[0]
+        for i in range(1, len(smi_data_list)):
+            df_smi_final = pd.merge(df_smi_final, smi_data_list[i], on=column_labels[language]['date'], how='outer')
+
+        df_smi_final = df_smi_final.set_index(column_labels[language]['date'])
+        df_smi_final.index = pd.to_datetime(df_smi_final.index)
+
+    if symbol is not None and stock_market_index is None:
+        df_final = df_symbol_final
+    elif symbol is None and stock_market_index is not None:
+        df_final = df_smi_final
+    else:
+        df_final = pd.merge(df_symbol_final, df_smi_final, on=column_labels[language]['date'], how='outer')
 
     if frequency.lower() == '1w':
         df_final = df_final.resample('W').last() if observation == 'last' else df_final.resample('W').mean()
@@ -284,6 +328,7 @@ def fetch_financials(symbol=None, start_year=None, end_year=None, exchange='TRY'
             df_final = df_final[cols]
             df_final.columns.values[0] = "Kod" if language == 'tr' else 'Code'
             df_final.columns.values[1] = sym
+            df_final[sym] = df_final[sym].str.strip()
 
             data_dict[sym] = df_final
 
