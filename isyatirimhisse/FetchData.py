@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import time
 
 def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
 
@@ -93,14 +94,23 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
 
     if symbol is not None:
         symbol_data_list = []
+        wait_time = 5
+        batch_count = 0
 
-        for s in symbol:
+        for index, s in enumerate(symbol):
+            if index % 100 == 0 and index != 0:
+                batch_count += 1
+                wait_time = 5 * batch_count
+            else:
+                wait_time = 5 * batch_count + 5
             url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
             url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
             res = requests.get(url)
             if not res.status_code == 200:
                 raise ConnectionError(error_messages[language]['response'])
             result = res.json()
+            print(s)
+            print(result)
             if result['value']:
                 historical = (
                     pd.DataFrame(result['value'])
@@ -108,6 +118,7 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
                     .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{s}'})
                 )
                 symbol_data_list.append(historical)
+            time.sleep(wait_time)
 
         if not symbol_data_list:
             raise ValueError(error_messages[language]['data'])

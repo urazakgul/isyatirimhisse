@@ -1,4 +1,4 @@
-# isyatirimhisse v2.1.0
+# isyatirimhisse v2.1.1
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==2.1.0
+pip install isyatirimhisse==2.1.1
 ```
 
 ## Kullanım
@@ -362,6 +362,10 @@ visualize_data(
 * `fetch_data` fonksiyonuna endekslere ait verileri çekmeyi sağlayacak `stock_market_index` parametresi eklenmiştir.
 * `fetch_financials` fonksiyonları ile çekilen finansalların kalemlerinde bulunan boşluklar kaldırılmıştır.
 
+### v2.1.1 - 13/08/2023
+
+* `fetch_data` fonksiyonu ile gönderilen istekler kontrol edilecek.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -396,7 +400,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==2.1.0
+pip install isyatirimhisse==2.1.1
 ```
 
 ## Usage
@@ -719,6 +723,10 @@ visualize_data(
 
 * Added the `stock_market_index` parameter to the `fetch_data` function to fetch data for specific stock market indices.
 * Removed the spaces in the items of the financials fetched with the `fetch_financials` functions.
+
+### v2.1.1 - 13/08/2023
+
+* Requests sent by the `fetch_data` function will be controlled.
 
 ## License
 
