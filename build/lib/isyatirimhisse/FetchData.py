@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import time
 
 def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
 
@@ -93,8 +94,15 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
 
     if symbol is not None:
         symbol_data_list = []
+        wait_time = 3
+        batch_count = 0
 
-        for s in symbol:
+        for index, s in enumerate(symbol):
+            if index % 100 == 0 and index != 0:
+                batch_count += 1
+                wait_time = 3 * batch_count
+            else:
+                wait_time = 3 * batch_count + 3
             url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
             url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
             res = requests.get(url)
@@ -108,6 +116,7 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
                     .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{s}'})
                 )
                 symbol_data_list.append(historical)
+            time.sleep(wait_time)
 
         if not symbol_data_list:
             raise ValueError(error_messages[language]['data'])
@@ -115,49 +124,101 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
         df_symbol_final = symbol_data_list[0]
         for i in range(1, len(symbol_data_list)):
             df_symbol_final = pd.merge(df_symbol_final, symbol_data_list[i], on=column_labels[language]['date'], how='outer')
-
         df_symbol_final[column_labels[language]['date']] = pd.to_datetime(df_symbol_final[column_labels[language]['date']], format='%d-%m-%Y').dt.strftime('%Y-%m-%d')
-        df_symbol_final = df_symbol_final.set_index(column_labels[language]['date'])
-        df_symbol_final.index = pd.to_datetime(df_symbol_final.index)
 
     if stock_market_index is not None:
-        smi_data_list = []
+        smi_data_dict = {smi: [] for smi in stock_market_index}
+        usdtry_historical = []
 
-        smi_start_date = start_date[-4:] + start_date[3:5] + start_date[:2]
-        smi_end_date = end_date[-4:] + end_date[3:5] + end_date[:2]
+        smi_start_date = datetime.strptime(start_date, "%d-%m-%Y")
+        smi_end_date = datetime.strptime(end_date, "%d-%m-%Y")
 
-        for smi in stock_market_index:
-            url = f"https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll?period=1440"
-            url += f"&from={smi_start_date}000000&to={smi_end_date}235959&endeks={smi}.I.BIST"
-            res = requests.get(url)
-            if not res.status_code == 200:
-                raise ConnectionError(error_messages[language]['response'])
-            result = res.json()
-            if result['data']:
-                historical = (
-                    pd.DataFrame(result['data'])
-                    .rename(columns={0: column_labels[language]['date'], 1: f'{smi}'})
-                )
-                historical[column_labels[language]['date']] = pd.to_datetime(historical[column_labels[language]['date']] / 1000, unit='s') + pd.to_timedelta(3, unit='h')
-                historical[column_labels[language]['date']] = historical[column_labels[language]['date']].dt.strftime('%Y-%m-%d')
-                smi_data_list.append(historical)
+        current_year = smi_start_date.year
+        end_year = smi_end_date.year
 
-        if not smi_data_list:
+        while current_year <= end_year:
+            year_start = datetime(current_year, 1, 1)
+            year_end = datetime(current_year, 12, 31)
+
+            formatted_start_date = year_start.strftime('%Y%m%d')
+            formatted_end_date = year_end.strftime('%Y%m%d')
+
+            if exchange == 'USD' and stock_market_index is not None:
+                url = f"https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll?period=1440"
+                url += f"&from={formatted_start_date}000000&to={formatted_end_date}235959&endeks={'USD/TRL'}"
+                res = requests.get(url)
+                if not res.status_code == 200:
+                    raise ConnectionError(error_messages[language]['response'])
+                result = res.json()
+                if result['data']:
+                    historical = (
+                        pd.DataFrame(result['data'])
+                        .rename(columns={0: column_labels[language]['date'], 1: 'USDTRY'})
+                    )
+                    historical[column_labels[language]['date']] = pd.to_datetime(historical[column_labels[language]['date']] / 1000, unit='s') + pd.to_timedelta(3, unit='h')
+                    historical[column_labels[language]['date']] = historical[column_labels[language]['date']].dt.strftime('%Y-%m-%d')
+                    usdtry_historical.append(historical)
+
+            for smi in stock_market_index:
+                url = f"https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll?period=1440"
+                url += f"&from={formatted_start_date}000000&to={formatted_end_date}235959&endeks={smi}.I.BIST"
+                res = requests.get(url)
+                if not res.status_code == 200:
+                    raise ConnectionError(error_messages[language]['response'])
+                result = res.json()
+                if result['data']:
+                    historical = (
+                        pd.DataFrame(result['data'])
+                        .rename(columns={0: column_labels[language]['date'], 1: f'{smi}'})
+                    )
+                    historical[column_labels[language]['date']] = pd.to_datetime(historical[column_labels[language]['date']] / 1000, unit='s') + pd.to_timedelta(3, unit='h')
+                    historical[column_labels[language]['date']] = historical[column_labels[language]['date']].dt.strftime('%Y-%m-%d')
+                    smi_data_dict[smi].append(historical)
+
+            current_year += 1
+
+        if not all(data_list for data_list in smi_data_dict.values()):
             raise ValueError(error_messages[language]['data'])
 
-        df_smi_final = smi_data_list[0]
-        for i in range(1, len(smi_data_list)):
-            df_smi_final = pd.merge(df_smi_final, smi_data_list[i], on=column_labels[language]['date'], how='outer')
+        combined_data = []
+        for smi, data_list in smi_data_dict.items():
+            for data_frame in data_list:
+                combined_data.append(data_frame)
 
-        df_smi_final = df_smi_final.set_index(column_labels[language]['date'])
-        df_smi_final.index = pd.to_datetime(df_smi_final.index)
+        df_smi_final = pd.DataFrame()
+        for df in combined_data:
+            stock_index = df.columns[1]
+            df['Stock_Index'] = stock_index
+            df.rename(columns={df.columns[1]: 'Value'}, inplace=True)
+            df_smi_final = pd.concat([df_smi_final, df], ignore_index=True)
+        df_smi_final = df_smi_final.pivot_table(index=column_labels[language]['date'], columns='Stock_Index', values='Value')
+        df_smi_final.columns.name = None
+        df_smi_final = df_smi_final.reset_index()
+
+    if exchange == 'USD' and stock_market_index is not None:
+        df_usdtry_historical = pd.DataFrame()
+        for usdtry_hist in usdtry_historical:
+            df_usdtry_historical = pd.concat([df_usdtry_historical, usdtry_hist], ignore_index=True)
+        df_smi_final = pd.merge(df_smi_final, df_usdtry_historical, on=column_labels[language]['date'], how='left')
+        date_column = df_smi_final[column_labels[language]['date']]
+        df_smi_final = df_smi_final.drop(column_labels[language]['date'], axis=1)
+        usdtry_column = df_smi_final['USDTRY']
+        df_smi_final = df_smi_final.drop(columns=['USDTRY'], axis=1)
+        df_smi_final = df_smi_final.divide(usdtry_column, axis=0)
+        df_smi_final.insert(0, column_labels[language]['date'], date_column)
 
     if symbol is not None and stock_market_index is None:
         df_final = df_symbol_final
+        df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']])
+        df_final= df_symbol_final.set_index(column_labels[language]['date'])
     elif symbol is None and stock_market_index is not None:
         df_final = df_smi_final
+        df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']])
+        df_final= df_smi_final.set_index(column_labels[language]['date'])
     else:
         df_final = pd.merge(df_symbol_final, df_smi_final, on=column_labels[language]['date'], how='outer')
+        df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']])
+        df_final= df_final.set_index(column_labels[language]['date'])
 
     if frequency.lower() == '1w':
         df_final = df_final.resample('W').last() if observation == 'last' else df_final.resample('W').mean()

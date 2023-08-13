@@ -94,15 +94,15 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
 
     if symbol is not None:
         symbol_data_list = []
-        wait_time = 5
+        wait_time = 3
         batch_count = 0
 
         for index, s in enumerate(symbol):
             if index % 100 == 0 and index != 0:
                 batch_count += 1
-                wait_time = 5 * batch_count
+                wait_time = 3 * batch_count
             else:
-                wait_time = 5 * batch_count + 5
+                wait_time = 3 * batch_count + 3
             url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
             url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
             res = requests.get(url)

@@ -1,4 +1,4 @@
-# isyatirimhisse v2.1.2
+# isyatirimhisse v2.1.3
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==2.1.2
+pip install isyatirimhisse==2.1.3
 ```
 
 ## Kullanım
@@ -370,6 +370,10 @@ visualize_data(
 
 * 2.1.1 sürümündeki kod hatası düzeltilmiştir.
 
+### v2.1.3 - 13/08/2023
+
+* Gönderilen isteklerdeki zaman kısıtlaması iyileştirildi.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -404,7 +408,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==2.1.2
+pip install isyatirimhisse==2.1.3
 ```
 
 ## Usage
@@ -735,6 +739,10 @@ visualize_data(
 ### v2.1.2 - 13/08/2023
 
 * Fixed a code bug in version 2.1.1.
+
+### v2.1.3 - 13/08/2023
+
+* Improved the time restriction on sent requests.
 
 ## License
 
