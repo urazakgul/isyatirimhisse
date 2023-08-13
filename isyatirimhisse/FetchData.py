@@ -109,8 +109,6 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
             if not res.status_code == 200:
                 raise ConnectionError(error_messages[language]['response'])
             result = res.json()
-            print(s)
-            print(result)
             if result['value']:
                 historical = (
                     pd.DataFrame(result['value'])
