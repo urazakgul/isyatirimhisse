@@ -3,9 +3,10 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import time
+import asyncio
+import aiohttp
 
-def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
+async def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=None, frequency='1d', observation='last', calculate_return=False, log_return=True, drop_na=True, save_to_excel=False, excel_file_name=None, language='en', exchange='TL'):
 
     column_labels = {
         'tr': {
@@ -27,7 +28,7 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
             'frequency' : "'frequency' parametresi '1d', '1w', '1m' veya '1y' olmalıdır.",
             'observation': "'observation' parametresi 'last' veya 'mean' olmalıdır.",
             'data': "Herhangi bir sembol için veri bulunamadı.",
-            'response': "Gönderdiğiniz istek İş Yatırım tarafından reddedildi."
+            'response': "HTTP Hatası"
         },
         'en': {
             'symbol_smi': "One of the parameters 'symbol' or 'stock_market_index' must be entered.",
@@ -39,7 +40,7 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
             'frequency' : "The 'frequency' parameter must be '1d', '1w', '1m' or '1y'.",
             'observation': "The 'observation' parameter must be 'last' or 'mean'.",
             'data': "No data found for any symbol.",
-            'response': "The request you sent has been rejected by IS Investment."
+            'response': "HTTP Error"
         }
     }
 
@@ -92,39 +93,52 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
     if language.lower() != "tr" and language.lower() != "en":
         raise KeyError("Geçersiz dil seçeneği. Sadece 'tr' veya 'en' girilmelidir./Invalid language. Only 'tr' or 'en' must be entered.")
 
-    if symbol is not None:
-        symbol_data_list = []
-        wait_time = 3
-        batch_count = 0
-
-        for index, s in enumerate(symbol):
-            if index % 100 == 0 and index != 0:
-                batch_count += 1
-                wait_time = 3 * batch_count
+    async def fetch_url(session, url):
+        async with session.get(url) as response:
+            if response.status == 200:
+                return await response.json()
             else:
-                wait_time = 3 * batch_count + 3
-            url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?"
-            url += f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
-            res = requests.get(url)
-            if not res.status_code == 200:
-                raise ConnectionError(error_messages[language]['response'])
-            result = res.json()
-            if result['value']:
-                historical = (
-                    pd.DataFrame(result['value'])
-                    .loc[:, ['HGDG_TARIH', closing_column]]
-                    .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{s}'})
-                )
-                symbol_data_list.append(historical)
-            time.sleep(wait_time)
+                raise ConnectionError(f"{error_messages[language]['response']}: {response.status}")
 
-        if not symbol_data_list:
-            raise ValueError(error_messages[language]['data'])
+    if symbol is not None:
 
-        df_symbol_final = symbol_data_list[0]
-        for i in range(1, len(symbol_data_list)):
-            df_symbol_final = pd.merge(df_symbol_final, symbol_data_list[i], on=column_labels[language]['date'], how='outer')
-        df_symbol_final[column_labels[language]['date']] = pd.to_datetime(df_symbol_final[column_labels[language]['date']], format='%d-%m-%Y').dt.strftime('%Y-%m-%d')
+        symbol = symbol[:400]
+
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit_per_host=5)) as session:
+            tasks = []
+            for index, s in enumerate(symbol):
+                url = f"https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil?" \
+                      f"hisse={s}&startdate={start_date}&enddate={end_date}.json"
+                tasks.append(fetch_url(session, url))
+
+            chunk_size = 5
+            chunked_tasks = [tasks[i:i + chunk_size] for i in range(0, len(tasks), chunk_size)]
+            results = []
+            for chunk_tasks in chunked_tasks:
+                chunk_results = await asyncio.gather(*chunk_tasks, return_exceptions=True)
+                results.extend(chunk_results)
+
+            symbol_data_list = []
+
+            for index, result in enumerate(results):
+                if isinstance(result, Exception):
+                    continue
+                if result and result['value']:
+                    historical = (
+                        pd.DataFrame(result['value'])
+                        .loc[:, ['HGDG_TARIH', closing_column]]
+                        .rename(columns={'HGDG_TARIH': column_labels[language]['date'], closing_column: f'{symbol[index]}'})
+                    )
+                    symbol_data_list.append(historical)
+
+            if not symbol_data_list:
+                raise ValueError(error_messages[language]['data'])
+
+            df_symbol_final = symbol_data_list[0]
+            for i in range(1, len(symbol_data_list)):
+                df_symbol_final = pd.merge(df_symbol_final, symbol_data_list[i], on=column_labels[language]['date'], how='outer')
+            df_symbol_final[column_labels[language]['date']] = pd.to_datetime(df_symbol_final[column_labels[language]['date']], format='%d-%m-%Y').dt.strftime('%Y-%m-%d')
+            df_symbol_final = df_symbol_final.sort_values(by=column_labels[language]['date'])
 
     if stock_market_index is not None:
         smi_data_dict = {smi: [] for smi in stock_market_index}
@@ -219,6 +233,8 @@ def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_date=N
         df_final = pd.merge(df_symbol_final, df_smi_final, on=column_labels[language]['date'], how='outer')
         df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']])
         df_final= df_final.set_index(column_labels[language]['date'])
+
+    df_final = df_final[df_final.index < pd.to_datetime(end_date, format='%d-%m-%Y')]
 
     if frequency.lower() == '1w':
         df_final = df_final.resample('W').last() if observation == 'last' else df_final.resample('W').mean()
