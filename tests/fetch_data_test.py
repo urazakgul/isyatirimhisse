@@ -2,7 +2,7 @@ import pytest
 import os
 import sys
 import asyncio
-from datetime import date
+from datetime import date, timedelta
 from isyatirimhisse import fetch_data
 
 # Scenario 1: No Symbol Entered
@@ -229,7 +229,7 @@ async def test_symbol_stock_market_index_compatibility():
     await run_test()
 
 # Scenario 11: Key Value 104
-# @pytest.mark.skip(reason="This test is currently disabled.")
+@pytest.mark.skip(reason="This test is currently disabled.")
 @pytest.mark.asyncio
 async def test_fetch_data_key_error_104():
 
@@ -281,6 +281,39 @@ async def test_fetch_data_key_error_104():
         assert len(data) > 0, "No data found."
 
         print(data)
+
+    await run_test()
+
+# Scenario 12: Date Range
+# @pytest.mark.skip(reason="This test is currently disabled.")
+@pytest.mark.asyncio
+async def test_fetch_data_date_range():
+
+    async def run_test():
+
+        symbol = ['KCHOL', 'ASELS']
+        stock_market_index = ['XU100']
+        start_date = '31-12-' + str((date.today().year - 1))
+        end_date = (date.today() - timedelta(days=1)).strftime("%d-%m-%Y")
+        frequency = '1d'
+        drop_na = False
+        language = 'tr'
+        save_to_excel = True
+
+        veriler = await fetch_data(
+            symbol=symbol,
+            stock_market_index=stock_market_index,
+            start_date=start_date,
+            end_date=end_date,
+            frequency=frequency,
+            drop_na=drop_na,
+            language=language,
+            save_to_excel=save_to_excel
+        )
+
+        assert len(veriler) > 0, "No data found."
+
+        print(veriler)
 
     await run_test()
 

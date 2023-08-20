@@ -234,7 +234,7 @@ async def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_
         df_final[column_labels[language]['date']] = pd.to_datetime(df_final[column_labels[language]['date']])
         df_final= df_final.set_index(column_labels[language]['date'])
 
-    df_final = df_final[df_final.index < pd.to_datetime(end_date, format='%d-%m-%Y')]
+    df_final = df_final[(df_final.index <= pd.to_datetime(end_date, format='%d-%m-%Y')) & (df_final.index >= pd.to_datetime(start_date, format='%d-%m-%Y'))].sort_index()
 
     if frequency.lower() == '1w':
         df_final = df_final.resample('W').last() if observation == 'last' else df_final.resample('W').mean()

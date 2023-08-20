@@ -1,4 +1,4 @@
-# isyatirimhisse v3.0.0
+# isyatirimhisse v3.0.1
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==3.0.0
+pip install isyatirimhisse==3.0.1
 ```
 
 Yüklü paketin versiyonuna aşağıdaki komut yardımıyla ulaşabilirsiniz.
@@ -582,6 +582,10 @@ await main_wrapper()
 * `fetch_data` fonksiyonundaki sembol parametresi 400 sembol ile sınırlandırılmıştır.
 * `visualize_data` fonksiyonunun çalıştırılma şekli asenkron yapı nedeniyle değişmiştir.
 
+### v3.0.1 - 20/08/2023
+
+* Veri çerçevesindeki tarih aralığı problemi düzeltildi.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -616,7 +620,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==3.0.0
+pip install isyatirimhisse==3.0.1
 ```
 
 You can find the version of the installed package with the following command.
@@ -1159,6 +1163,10 @@ await main_wrapper()
 * The `fetch_data` function is asynchronous.
 * The symbol parameter in the `fetch_data` function is limited to 400 symbols.
 * The way `visualize_data` is executed changed due to its asynchronous structure.
+
+### v3.0.1 - 20/08/2023
+
+* Fixed date range problem in the data frame.
 
 ## License
 
