@@ -1,4 +1,4 @@
-# isyatirimhisse v3.0.1
+# isyatirimhisse v3.0.2
 
 ## Türkçe tercih edenler için:
 
@@ -24,7 +24,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==3.0.1
+pip install isyatirimhisse==3.0.2
 ```
 
 Yüklü paketin versiyonuna aşağıdaki komut yardımıyla ulaşabilirsiniz.
@@ -586,6 +586,10 @@ await main_wrapper()
 
 * Veri çerçevesindeki tarih aralığı problemi düzeltildi.
 
+### v3.0.2 - 05/10/2023
+
+* 400 olan sembol sınırlaması kaldırıldı.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -620,7 +624,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==3.0.1
+pip install isyatirimhisse==3.0.2
 ```
 
 You can find the version of the installed package with the following command.
@@ -1167,6 +1171,10 @@ await main_wrapper()
 ### v3.0.1 - 20/08/2023
 
 * Fixed date range problem in the data frame.
+
+### v3.0.2 - 05/10/2023
+
+* Removed the limit on the number of stock symbols, which was 400.
 
 ## License
 

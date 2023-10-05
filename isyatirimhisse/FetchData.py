@@ -102,8 +102,6 @@ async def fetch_data(symbol=None, stock_market_index=None, start_date=None, end_
 
     if symbol is not None:
 
-        symbol = symbol[:400]
-
         async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit_per_host=5)) as session:
             tasks = []
             for index, s in enumerate(symbol):
