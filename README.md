@@ -1,6 +1,8 @@
-# isyatirimhisse v3.0.2
+# isyatirimhisse v4.0.0
 
 ## Türkçe tercih edenler için:
+
+***Those who prefer English can scroll down the page.***
 
 ## Açıklama
 
@@ -9,6 +11,21 @@
 *** UYARI ***
 
 `isyatirimhisse`, resmi İş Yatırım Menkul Değerler A.Ş. kütüphanesi değildir ve şirket tarafından doğrulanmamıştır. Kullanıcılar, kütüphaneyi kullanmadan önce ilgili tüm verilere erişim için İş Yatırım Menkul Değerler A.Ş.'nin kullanım koşullarını ve haklarını incelemelidir. `isyatirimhisse`, yalnızca kişisel kullanım amaçları için tasarlanmıştır.
+
+İş Yatırım web sitesinden hisse senedi verileri ve finansal tablolara erişmek için Python paketini kullanırken, aşırı talep göndermenin potansiyel sonuçlarına dikkat etmek çok önemlidir. Aşırı talep aşağıdaki çeşitli olumsuz etkilere neden olabilir:
+
+* **Performans Etkisi:** Kısa bir süre içinde çok fazla talep göndermek, İş Yatırım web sitesinin performansını ve yanıt verme hızını ciddi şekilde etkileyebilir.
+
+* **Hizmet Kesintisi:** Yoğun veri çekme işlemleri, web sitesindeki güvenlik önlemlerini tetikleyebilir ve geçici hizmet kesintilerine neden olabilir.
+
+* **IP Engelleme:** Tekrarlayan veya agresif veri çekme davranışları, IP adresinizin web sitesine erişimini geçici veya kalıcı olarak engellemesine yol açabilir.
+
+Bu sorunlardan kaçınmak ve sorunsuz bir işlem sağlamak için aşağıdaki önerileri dikkate alabilirsiniz.
+
+- Taleplerinizin hızını, web sitesinin kapasitesini dikkate alarak makul bir seviyede tutun.
+- Sıkça çekilen verileri yerel olarak saklamaya çalışın. Böylece tekrarlayan taleplere gerek kalmayacaktır.
+
+Bu kurallara uymak, kesinti riskini en aza indirgeyebilir ve İş Yatırım web sitesinin hem sizin hem de diğer kullanıcılar için güvenilir bir deneyim sunmasını sağlar.
 
 ## Kurulum
 
@@ -24,7 +41,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==3.0.2
+pip install isyatirimhisse==4.0.0
 ```
 
 Yüklü paketin versiyonuna aşağıdaki komut yardımıyla ulaşabilirsiniz.
@@ -38,477 +55,168 @@ pip show isyatirimhisse
 ### Kütüphanenin İçeri Aktarılması
 
 ```python
-from isyatirimhisse import fetch_data, fetch_financials, visualize_data
+from isyatirimhisse import StockData, Financials
 ```
 
 ### Tanımlar
 
-* `fetch_data`: Belirtilen hisse senetlerine ve endekslere ait verileri alır.
-* `fetch_financials`: Belirtilen hisse senetlerine ait finansal tabloları alır.
-* `visualize_data`: Belirtilen hisse senetlerine ait verileri görselleştirir ve `fetch_data` çıktıları ile uyumlu çalışması için tasarlanmıştır.
+* `StockData`: Belirtilen hisse senetlerine ve endekslere ait verileri alır.
+* `Financials`: Belirtilen hisse senetlerine ait finansal tabloları alır.
 
-### Asenkron Programlama
+### Metot Parametreleri ve Örnekler
 
-Asenkron programlama, bir programın belirli görevleri eşzamanlı olarak yürütebilmesini sağlayan bir programlama yaklaşımıdır.
+#### `StockData`
 
-Bir başka açıdan asenkron programlama, web sitelerine gönderilen isteklerin (HTTP istekleri gibi) cevaplarını beklerken programın başka işlemleri yapabilmesini sağlayan bir programlama tekniğidir. Geleneksel senkron programlamada, bir istek gönderildiğinde programın çalışması o isteğin cevabını alana kadar durur. Asenkron programlamada ise isteklerin cevapları bekleme süreci boyunca bile program başka işlemleri yapabilir.
-
-Async yapıdaki bir fonksiyon en basit haliyle aşağıdaki gibi çalıştırılabilir.
-
-```python
-import asyncio
-
-async def main():
-    veriler = await fetch_data(symbol='THYAO', start_date='01-01-2023')
-    return veriler
-
-async def run():
-    sonuc = await main()
-    print(sonuc)
-
-    # Diğer işlemler burada yapılabilir.
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
-```
-
-Yukarıdaki örnek özelinde yapılan işlemler aşağıdaki gibidir.
-
-* İlk olarak, `asyncio` isimli bir modül içe aktarılır. Bu modül, asenkron programlamayı desteklemek için kullanılır.
-
-* `main` isminde bir asenkron fonksiyon tanımlanır. Bu fonksiyon, `fetch_data` isimli bir başka asenkron fonksiyonu çağırıyor.
-
-* `main` fonksiyonu, `fetch_data` fonksiyonundan gelen veriyi `veriler` değişkenine atamak için `await` anahtar kelimesini kullanarak veriyi bekliyor. Bu, `fetch_data` fonksiyonunun bir asenkron işlev olduğu ve tamamlanana kadar `main` fonksiyonunun duraklayacağı anlamına gelir.
-
-* `main` fonksiyonu sonucunda `veriler` değişkeni elde edilir ve bu veri `return` ifadesiyle döndürülür.
-
-* `run` isminde başka bir asenkron fonksiyon tanımlanır. Bu fonksiyon, `main` fonksiyonunu çağırıyor ve sonucunu `sonuc` değişkenine atıyor.
-
-* `run` fonksiyonu, `sonuc` değişkenini ekrana basarak sonucu görüntülüyor.
-
-* `main_wrapper` isimli bir asenkron fonksiyon daha tanımlanıyor. Bu fonksiyon, `run` fonksiyonunu bir asenkron görev olarak oluşturuyor ve bu görevin tamamlanmasını bekliyor.
-
-* Son olarak, `await main_wrapper()` ifadesi ile `main_wrapper` fonksiyonu çağrılıyor ve bu, tüm asenkron işlemlerin yürütülmesini sağlıyor.
-
-### Fonksiyon Parametreleri ve Örnekler
-
-#### `fetch_data`
-
-* `symbol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
-* `stock_market_index` (str veya list, varsayılan None): Endeks sembolü veya sembollerinin listesi (örn. `'XU100'` veya `['XU100','XBANK']`).
+* `symbols` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
 * `start_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında başlangıç tarihi (örn. `'03-01-2023'`).
-* `end_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında bitiş tarihi (örn. `'31-07-2023'`). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
-* `frequency` (str, varsayılan '1d'): Veri frekansı (`'1d'`: Günlük, `'1w'`: Haftalık, `'1m'`: Aylık, `'1y'`: Yıllık).
+* `end_date` (str, varsayılan None): Verilerin 'GG-AA-YYYY' formatında bitiş tarihi (örn. `'29-09-2023'`). Eğer belirtilmezse, sistem tarihini (bugünkü tarihi) otomatik olarak kullanır.
+* `exchange` (str, varsayılan '2'): Hisse senedi fiyatları için para birimi (`'0'`: Türk Lirası, `'1'`: ABD Doları, `'2'`: Türk Lirası ve ABD Doları).
+* `frequency` (str, varsayılan '1d'): Veri frekansı (`'1d'`: Günlük, `'1w'`: Haftalık, `'1mo'`: Aylık, `'3mo'`: Çeyreklik, `'1y'`: Yıllık).
 * `observation` (str, varsayılan 'last'): Haftalık, aylık ve yıllık frekanslarda istenen gözlem (`'last'`: Son, `'mean'`: Ortalama).
-* `calculate_return` (bool, varsayılan False): Getiri hesaplanacak mı?
-* `log_return` (bool, varsayılan True): Logaritmik getiri mi hesaplanacak?
-* `drop_na` (bool, varsayılan True): Eksik değerler kaldırılacak mı?
+* `return_type` (str, varsayılan '0'): Ham veriler mi kullanılacak yoksa getiri mi hesaplanacak? (`'0'`: Ham, `'1'`: Logaritmik Getiri, `'2'`: Basit Getiri)
 * `save_to_excel` (bool, varsayılan False): Excel dosyasına kaydedilecek mi?
-* `excel_file_name` (str, varsayılan None): Kaydedilecek excel dosyasının ismi (örn. 'data.xlsx' veya 'data'). Geçerli bir dosya ismi belirtilmezse, sistem tarihi kullanılarak 'data_YYYYMMDD.xlsx' ismiyle kaydedilir. Eğer kaydedilecek dizinde aynı isimden başka bir dosya varsa farklı bir isimle kaydeder.
-* `language` (str, varsayılan 'en'): Çıktıların dili (`'tr'`: Türkçe, `'en'`: İngilizce).
-* `exchange` (str, varsayılan 'TL'): Hisse senedi fiyatları için para birimi (`'TL'`: Türk Lirası, `'USD'`: ABD Doları).
 
-`fetch_data` fonksiyonu bir pandas veri çerçevesi döndürür.
+`StockData` sınıfına ait `get_data` metodu bir pandas veri çerçevesi döndürür.
 
 ```python
 # Örnek 1: Tek hisse senedine ait başlangıç tarihi belli ve son işlem gününe kadar olan kapanış fiyatlarını al.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = 'GARAN'
-    start_date = '03-01-2023'
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    print(sonuc)
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
+df = stock_data.get_data(
+    symbols='THYAO',
+    start_date='02-01-2023'
+)
+print(df)
 ```
 
 ```python
-# Örnek 2: Birden fazla hisse senedine ait başlangıç tarihi belli ve son işlem gününe kadar olan haftalık ortalama kapanış fiyatlarını al.
+# Örnek 2: Birden fazla hisse senedine ait başlangıç tarihi belli ve son işlem gününe kadar olan haftalık ortalama kapanış fiyatlarını TL bazında al.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    start_date = '03-01-2023'
-    frequency = '1w'
-    observation = 'mean'
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date = '02-01-2023',
+    exchange='0',
+    frequency='1w',
+    observation='mean'
+)
+print(df)
 
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        frequency=frequency,
-        observation=observation
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    print(sonuc)
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
+# Haftalık frekansta veriler Pazar günleri başlangıç kabul edilerek ayarlanmaktadır.
 ```
 
 ```python
-# Örnek 3: Birden fazla hisse senedine ait başlangıç ve bitiş tarihleri belli aylık USD kapanış fiyatları üzerinden basit getirileri al.
+# Örnek 3: Birden fazla hisse senedine ait başlangıç ve bitiş tarihleri belli aylık USD fiyatları üzerinden logaritmik getirileri al.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    start_date = '01-12-2021'
-    end_date = '30-12-2022'
-    frequency = '1m'
-    calculate_return = True
-    log_return = False
-    exchange = 'USD'
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return,
-        log_return=log_return,
-        exchange=exchange
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    print(sonuc)
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date='01-01-2023',
+    end_date='29-09-2023',
+    exchange='1',
+    frequency='1mo',
+    return_type='1'
+)
+print(df)
 ```
 
 ```python
-# Örnek 4: Birden fazla hisse senedine ait başlangıç ve bitiş tarihleri belli eksik değerleri kaldırmadan yıllık ortalama USD kapanış fiyatlarını al. Ayrıca dosya ismi belirtmeden excel dosyasına kaydet ve çıktıları Türkçe yap.
+# Örnek 4: Birden fazla hisse senedine ait başlangıç ve bitiş tarihleri belli çeyreklik USD fiyatları üzerinden basit getirileri al.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['EUPWR', 'THYAO']
-    start_date = '02-01-2012'
-    end_date = '30-12-2022'
-    frequency = '1y'
-    drop_na = False
-    save_to_excel = True
-    language = 'tr'
-    exchange = 'USD'
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date='01-01-2023',
+    end_date='29-09-2023',
+    exchange='1',
+    frequency='3mo',
+    return_type='2'
+)
+print(df)
+```
 
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        drop_na=drop_na,
-        save_to_excel=False,
-        language=language,
-        exchange=exchange
-    )
-    return veriler
+```python
+# Örnek 5: Birden fazla hisse senedine ait başlangıç ve bitiş tarihleri belli yıllık ortalama USD fiyatlarını al. Sonucu excel dosyasına kaydet.
 
-async def run():
-    sonuc = await main()
-    print(sonuc)
+stock_data = StockData()
 
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
+df = stock_data.get_data(
+    symbols=['THYAO','EUPWR'],
+    start_date='01-01-2012',
+    end_date='06-10-2023',
+    exchange='1',
+    frequency='1y',
+    return_type='1',
+    save_to_excel=True
+)
+print(df)
 
 # Not: Örnekte bulunan EUPWR hisse senedinin 2023 yılı öncesi verileri olmadığı için çıktıda görünmeyecektir.
 ```
 
-```python
-# Örnek 5: Birden fazla hisse senedine ve endekse ait başlangıç ve bitiş tarihleri belli eksik değerleri kaldırmadan aylık ortalama USD kapanış fiyatlarını al. Ayrıca dosya ismi belirtmeden excel dosyasına kaydet ve çıktıları Türkçe yap.
+#### `Financials`
 
-import asyncio
-
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    stock_market_index = ['XU030', 'XBANK']
-    start_date = '02-01-2012'
-    end_date = '31-07-2023'
-    frequency = '1m'
-    drop_na = False
-    save_to_excel = True
-    language = 'tr'
-    exchange = 'USD'
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        stock_market_index=stock_market_index,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        drop_na=drop_na,
-        save_to_excel=save_to_excel,
-        language=language,
-        exchange=exchange
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    print(sonuc)
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
-```
-
-#### `fetch_financials`
-
-* `symbol` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
-* `start_year` (str, varsayılan None): Finansal tabloların YYYY formatında başlangıç yılı (örn. `'2022'`).
-* `end_year` (str, varsayılan None): Finansal tabloların YYYY formatında bitiş yılı (örn. `'2023'`).
+* `symbols` (str veya list, varsayılan None): Hisse senedi sembolü veya sembollerinin listesi (örn. `'AKBNK'` veya `['AKBNK','THYAO']`).
+* `start_year` (str, varsayılan None): Finansal tabloların 'YYYY' formatında başlangıç yılı (örn. `'2022'`). Belirtilmezse 2 yıl öncesini dikkate alır.
+* `end_year` (str, varsayılan None): Finansal tabloların 'YYYY' formatında bitiş yılı (örn. `'2023'`). Belirtilmezse mevcut yılı dikkate alır.
 * `exchange` (str, varsayılan 'TRY'): Finansal tablolar için para birimi (`'TRY'`: Türk Lirası, `'USD'`: ABD Doları).
 * `financial_group` (str, varsayılan '1'): Finansal tablo türü (`'1'`: Seri XI NO:29, `'2'`: Konsolide Olmayan UFRS, `'3'`: Konsolide UFRS).
 * `save_to_excel` (bool, varsayılan False): Excel dosyasına kaydedilecek mi?
-* `language` (str, varsayılan 'en'): Çıktıların dili (`'tr'`: Türkçe, `'en'`: İngilizce).
 
-`fetch_financials` fonksiyonu bir sözlük döndürür.
+`Financials` fonksiyonunun `get_data` metodu bir sözlük döndürür.
 
 ```python
-# Örnek 1: Tek bir hisse senedi için finansal tabloları çek ve dili Türkçe olarak ayarlayıp excel dosyasına kaydet.
-symbol='THYAO'
-start_year='2022'
-end_year='2023'
-save_to_excel=True
-language='tr'
+# Örnek 1: Tek bir hisse senedi için finansal tabloları istenilen başlangıç yılından itibaren çek.
 
-veri = fetch_financials(
-    symbol=symbol,
-    start_year=start_year,
-    end_year=end_year,
-    save_to_excel=save_to_excel,
-    language=language
+financials = Financials()
+
+df = financials.get_data(
+    symbols='THYAO',
+    start_year='2020'
 )
+print(df)
 ```
 
 ```python
-# Örnek 2: Birden fazla hisse senedi için konsolide olmayan UFRS'ye göre finansal tabloları çek.
-symbols=['AKBNK', 'THYAO']
-start_year='2022'
-end_year='2023'
-financial_group='2'
-language='tr'
+# Örnek 2: Birden fazla hisse senedi için finansal tabloları istenilen başlangıç ve bitiş yılı aralığında çek.
+# Sözlük tipinde saklanan verilerden istenen şirket aşağıdaki gibi çekilebilir.
 
-veri = fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    end_year=end_year,
-    financial_group=financial_group,
-    language=language
-)
-```
+financials = Financials()
 
-```python
-# Örnek 3: Belirtilen birden fazla hisse senedi için USD bazlı finansal tabloları al ve örnek bir hisse senedine ait finansal tablolara Türkçe kullanarak ulaş.
-symbols=['AKBNK', 'THYAO']
-start_year='2018'
-language='tr'
-exchange='USD'
-
-veri = fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    language=language,
-    exchange=exchange
+df = financials.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_year='2019',
+    end_year='2023',
+    exchange='TRY',
+    financial_group='1',
+    save_to_excel=True
 )
 
-# Örnekte bulunan THYAO hisse senedinin finansal tabloları
-thyao_finansallar=veri['THYAO']
+import pandas as pd
 
-# İstenen hisse senedine ait finansal tablolar gelmiyorsa veri kaynağı belirtilen financial_group parametresi değerine ait tabloyu yayınlamamıştır.
+df_thyao = pd.DataFrame(df['THYAO'])
 ```
 
 ```python
-# Örnek 4: Sözlük tipinde saklanan veriler bir veri çerçevesinde aşağıdaki gibi bir araya getirilebilir.
+# Örnek 3: Birden fazla hisse senedi için finansal tabloları istenilen başlangıç ve bitiş yılı aralığında çek.
 
-symbols=['SISE', 'THYAO']
-start_year='2018'
-language='tr'
-exchange='USD'
+financials = Financials()
 
-veri = fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    language=language,
-    exchange=exchange
+df = financials.get_data(
+    symbols=['THYAO','AKBNK'],
+    start_year='2019',
+    end_year='2023',
+    exchange='TRY',
+    financial_group='1',
+    save_to_excel=True
 )
 
-birlestirilmis_veri = pd.DataFrame()
-for symbol, data in veri.items():
-    data = data.rename(columns={symbol: 'KALEM'})
-    data['SEMBOL'] = symbol
-    birlestirilmis_veri = pd.concat([birlestirilmis_veri, data], ignore_index=True)
+# Not: Örnekte bulunan AKBNK hisse senedi Seri XI NO:29'a uymadığı için (UFRS kullanılmalı) çıktıda görünmeyecektir.
 ```
-
-#### `visualize_data`
-
-* `df` (pandas DataFrame, varsayılan None): Hisse senedi verilerinin bulunduğu pandas DataFrame.
-* `plot_type` (str, varsayılan '1'). Görselleştirme türü (`'1'`: Çizgi Grafiği, `'2'`: Korelasyon Isı Matrisi, `'3'`: Dağılım Matrisi).
-* `normalization` (bool, varsayılan False): Veriler normalize edilecek mi? True olarak ayarlandığında veriler 0 ile 1 arasında ölçeklendirilir.
-* `language` (str, varsayılan 'en'): Çıktıların dili (`'tr'`: Türkçe, `'en'`: İngilizce).
-* `**kwargs`: Görselleştirme türlerine özel ek seçenekler. Bu parametreler, belirli bir görselleştirme türü için özel ayarlamalar yapmak için kullanılabilir.
-  * Görselleştirme Türleri için **kwargs Parametreleri:
-    * Çizgi Grafiği:
-      * `linewidth` (float, varsayılan 1.5): Çizgi kalınlığı.
-      * `fontsize` (int, varsayılan 12): Başlık büyüklüğü.
-      * `figsize` (tuple, varsayılan (10, 6)): Grafik çıktısının boyutu.
-    * Korelasyon Isı Matrisi:
-      * `cmap` (str, varsayılan 'coolwarm'): Renk haritası.
-      * `vmin` (float, varsayılan -1): Renk haritasındaki en küçük değer.
-      * `vmax` (float, varsayılan 1): Renk haritasindaki en büyük değer.
-      * `fontsize` (int, varsayılan 12): Başlık büyüklüğü.
-      * `figsize` (tuple, varsayılan (10, 6)): Grafik çıktısının boyutu.
-    * Dağılım Matrisi:
-      * `alpha` (float, varsayılan 0.5): Nokta şeffaflığı.
-      * `fontsize` (int, varsayılan 12): Başlık büyüklüğü.
-      * `height` (float, varsayılan 2.5): Her alt grafiğin yüksekliği.
-      * `aspect` (float, varsayılan 1): Her alt grafiğin genişlik-yükselik oranı.
-
-`visualize_data` fonksiyonu, pandas veri çerçevesi içerisindeki verileri grafikler ve görsel öğelerle temsil eder.
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS']
-    start_date='01-01-2013'
-    end_date='31-07-2023'
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    # Çizgi grafik, fiyatları normalize et, çizgileri kalınlaştır, başlığı büyüt ve çıktıyı Türkçe al.
-    visualize_data(
-        df=sonuc,
-        plot_type='1',
-        normalization=True,
-        language='tr',
-        linewidth=2,
-        fontsize=14
-    )
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_1.png?raw=true)
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS']
-    start_date='01-12-2012'
-    end_date='31-07-2023'
-    frequency='1m'
-    calculate_return=True
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    # Korelasyon ısı matrisi, ek bir parametre ekleme ve çıktıyı Türkçe al.
-    visualize_data(
-        df=sonuc,
-        plot_type='2',
-        language='tr'
-    )
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_2.png?raw=true)
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN']
-    start_date='01-12-2012'
-    end_date='31-07-2023'
-    frequency='1m'
-    calculate_return=True
-
-    veriler = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return
-    )
-    return veriler
-
-async def run():
-    sonuc = await main()
-    # Dağılım matrisi, daha şeffaf ve çıktıyı Türkçe al.
-    visualize_data(
-        df=sonuc,
-        plot_type='3',
-        language='tr',
-        alpha=0.1
-    )
-
-async def main_wrapper():
-    gorev = asyncio.create_task(run())
-    await gorev
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_3.png?raw=true)
 
 ## Notlar
 
@@ -590,6 +298,14 @@ await main_wrapper()
 
 * 400 olan sembol sınırlaması kaldırıldı.
 
+### v4.0.0 - 07/10/2023
+
+* `StockData` ve `Financials` isimli iki sınıf oluşturuldu.
+* `StockData` sınıfındaki `get_data` ve `Financials` sınıfındaki `get_data` metotlarının parametreleri güncellendi.
+* Tablo çıktılarının yapısı değiştirildi.
+* Veri görselleştirme özelliği kaldırıldı.
+* Asenkron yapı kaldırıldı.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -604,11 +320,26 @@ Bu proje MIT Lisansı altında lisanslanmıştır.
 
 ## Description
 
-`isyatirimhisse` is a customizable Python library developed to simplify data fetching from IS Investment's website.
+`isyatirimhisse` is a customizable Python library developed to simplify data fetching from Is Investment's website.
 
 *** WARNING ***
 
-`isyatirimhisse` is not the official IS Investment Securities library and has not been verified by the company. Users should review IS Investment Securities' terms of use and rights to access all relevant data before using the library. `isyatirimhisse` is intended for personal use only.
+`isyatirimhisse` is not the official Is Investment Securities library and has not been verified by the company. Users should review Is Investment Securities' terms of use and rights to access all relevant data before using the library. `isyatirimhisse` is intended for personal use only.
+
+When using the Python package to access stock data and financial statements from the Is Investment website, it is crucial to be mindful of the potential consequences of excessive requests. Excessive requests can lead to various adverse effects:
+
+* **Performance Impact:** Sending too many requests in a short period can significantly affect the performance and response time of the Is Investment website.
+
+* **Service Disruption:** Intensive data retrieval processes can trigger security measures on the website, causing temporary service disruptions.
+
+* **IP Blocking:** Repetitive or aggressive data retrieval behavior may lead to your IP address being temporarily or permanently blocked from accessing the website.
+
+To avoid these issues and ensure smooth operations, consider the following recommendations:
+
+- Keep the speed of your requests at a reasonable level, taking into account the website's capacity.
+- Attempt to store frequently retrieved data locally, eliminating the need for repetitive requests.
+
+Adhering to these guidelines can minimize the risk of interruptions and ensure that the Is Investment website provides a reliable experience for both you and other users.
 
 ## Installation
 
@@ -624,7 +355,7 @@ pip install isyatirimhisse
 If you want to install a specific version, you can run the command as in the example below.
 
 ```bash
-pip install isyatirimhisse==3.0.2
+pip install isyatirimhisse==4.0.0
 ```
 
 You can find the version of the installed package with the following command.
@@ -638,463 +369,168 @@ pip show isyatirimhisse
 ### Importing the Library
 
 ```python
-from isyatirimhisse import fetch_data, fetch_financials, visualize_data
+from isyatirimhisse import StockData, Financials
 ```
 
 ### Definitions
 
-* `fetch_data`: Fetches data for the specified stocks and indices.
-* `fetch_financials`: Fetches financial statements for the specified stocks.
-* `visualize_data`: Visualizes the data for the specified stocks is designed to work with the outputs of `fetch_data`.
+* `StockData`: Fetches data for the specified stocks and indices.
+* `Financials`: Fetches financial statements for the specified stocks.
 
-### Asynchronous Programming
+### Method Parameters and Examples
 
-Asynchronous programming is an approach to programming that enables a program to execute certain tasks concurrently.
-
-In another sense, asynchronous programming is a programming technique that allows a program to perform other tasks while waiting for responses to actions like requests sent to websites (such as HTTP requests). In traditional synchronous programming, when a request is sent, the program halts its execution until it receives the response for that request. However, in asynchronous programming, the program can perform other tasks even while waiting for the responses to actions.
-
-A function with an asynchronous structure can be executed as shown below.
-
-```python
-import asyncio
-
-async def main():
-    data = await fetch_data(symbol='THYAO', start_date='01-01-2023')
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-    # Other operations can be done here.
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
-```
-
-The operations performed in the given example are as follows:
-
-* Firstly, a module named `asyncio` is imported. This module is used to support asynchronous programming.
-
-* An asynchronous function named `main` is defined. This function calls another asynchronous function named `fetch_data`.
-
-* The `main` function uses the `await` keyword to wait for the data from the `fetch_data` function to be assigned to the `data` variable. This signifies that the `fetch_data` function is asynchronous, and the `main` function will pause until it completes.
-
-* Upon completion of the `main` function, the `data` variable is obtained and returned using the `return` statement.
-
-* Another asynchronous function named `run` is defined. This function calls the `main` function and assigns its result to the `result` variable.
-
-* The `run` function displays the `result` variable's value on the screen to show the outcome.
-
-* Yet another asynchronous function named `main_wrapper` is defined. This function creates an asynchronous task with the `run` function and awaits the completion of this task.
-
-* Finally, the statement `await main_wrapper()` is used to call the `main_wrapper` function, which ensures the execution of all asynchronous processes.
-
-### Function Parameters and Examples
-
-#### `fetch_data`
+#### `StockData`
 
 * `symbol` (str or list, default None): The stock symbol or list of symbols (e.g. `'AKBNK'` or `['AKBNK','THYAO']`).
-* `stock_market_index` (str or list, default None): The index symbol or list of indices (e.g. `'XU100'` or `['XU100','XBANK']`).
 * `start_date` (str, default None): Start date of the data in 'DD-MM-YYYY' format (e.g. `'03-01-2023'`).
-* `end_date` (str, default None): End date of the data in 'DD-MM-YYYY' format (e.g. `31-07-2023`). If not specified, it automatically uses the system date (today's date).
-* `frequency` (str, default '1d'): Data frequency (`'1d'`: Daily, `'1w'`: Weekly, `'1m'`: Monthly, `'1y'`: Yearly).
-* `observation` (str, default 'last'): The desired observation at weekly, monthly and yearly frequencies (`'last'`: Last, `'mean'`: Average).
-* `calculate_return` (bool, default False): Will the return be calculated?
-* `log_return` (bool, default True): Will a logarithmic return be calculated?
-* `drop_na` (bool, default True): Will missing values be removed?
+* `end_date` (str, default None): End date of the data in 'DD-MM-YYYY' format (e.g. `29-09-2023`). If not specified, it automatically uses the system date (today's date).
+* `exchange` (str, default '2'): Exchange for stock prices (`'0'`: Turkish Lira, `'1'`: US Dollar, `'2'`: Turkish Lira and US Dollar).
+* `frequency` (str, default '1d'): Data frequency (`'1d'`: Daily, `'1w'`: Weekly, `'1m'`: Monthly, `'3mo'`: Quarterly, `'1y'`: Yearly).
+* `observation` (str, default 'last'): The desired observation at weekly, monthly, quarterly and yearly frequencies (`'last'`, `'mean'`).
+* `return_type` (str, default '0'): Will raw data be used or returns be calculated? (`'0'`: Raw, `'1'`: Logarithmic Return, `'2'`: Simple Return)
 * `save_to_excel` (bool, default False): Will it be saved in excel file?
-* `excel_file_name` (str, default None): The name of the excel file to save to (e.g. 'data.xlsx' or 'data'). If no valid file name is specified, it will be saved as 'data_YYYYMMDD.xlsx' using the system date. If there is another file with the same name in the directory to be saved, it will save with a different name.
-* `language` (str, default 'en'): The language of the output (`'tr'`: Turkish, `'en'`: English).
-* `exchange` (str, default 'TL'): Exchange for stock prices (`'TL'`: Turkish Lira, `'USD'`: US Dollar).
 
-The `fetch_data` function returns a pandas data frame.
+The `get_data` method of the `StockData` class returns a pandas DataFrame.
 
 ```python
-# Example 1: Get the closing prices of a single stock with a given start date up to the last trading day.
+# Example 1: Retrieve the closing prices for a single stock with a specified start date and up to the last trading day.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = 'GARAN'
-    start_date = '03-01-2023'
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date
-    )
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
+df = stock_data.get_data(
+    symbols='THYAO',
+    start_date='02-01-2023'
+)
+print(df)
 ```
 
 ```python
-# Example 2: Get the weekly average closing prices of multiple stocks with a given start date up to the last trading day.
+# Example 2: Retrieve the weekly average closing prices in Turkish Lira for multiple stocks with specified start dates and up to the last trading day.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    start_date = '03-01-2023'
-    frequency = '1w'
-    observation = 'mean'
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date = '02-01-2023',
+    exchange='0',
+    frequency='1w',
+    observation='mean'
+)
+print(df)
 
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        frequency=frequency,
-        observation=observation
-    )
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
+# The data is adjusted with a weekly frequency, considering Sunday as the starting point.
 ```
 
 ```python
-# Example 3: Get the simple returns of multiple stocks based on monthly USD closing prices with specific start and end dates.
+# Example 3: Compute the logarithmic returns for multiple stocks with known start and end dates, using monthly USD prices.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    start_date = '01-12-2021'
-    end_date = '30-12-2022'
-    frequency = '1m'
-    calculate_return = True
-    log_return = False
-    exchange = 'USD'
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return,
-        log_return=log_return,
-        exchange=exchange
-    )
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date='01-01-2023',
+    end_date='29-09-2023',
+    exchange='1',
+    frequency='1mo',
+    return_type='1'
+)
+print(df)
 ```
 
 ```python
-# Example 4: Get the annual average USD closing prices of multiple stocks without removing missing values with specific start and end dates. Also save to excel file without specifying a filename.
+# Example 4: Compute the simple returns for multiple stocks with known start and end dates, using quarterly USD prices.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['EUPWR', 'THYAO']
-    start_date = '02-01-2012'
-    end_date = '30-12-2022'
-    frequency = '1y'
-    drop_na = False
-    save_to_excel = True
-    exchange = 'USD'
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        drop_na=drop_na,
-        save_to_excel=save_to_excel,
-        exchange=exchange
-    )
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
-
-# Note: The EUPWR stock in the example will not appear in the output as it does not have data before 2023.
+df = stock_data.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_date='01-01-2023',
+    end_date='29-09-2023',
+    exchange='1',
+    frequency='3mo',
+    return_type='2'
+)
+print(df)
 ```
 
 ```python
-# Example 5: Get the monthly average USD closing prices of multiple stocks and indices without removing missing values with specific start and end dates. Also save to excel file without specifying a filename.
+# Example 5: Retrieve the annual average USD prices for multiple stocks with known start and end dates. Save the result to an Excel file.
 
-import asyncio
+stock_data = StockData()
 
-async def main():
-    symbol = ['GARAN', 'THYAO']
-    stock_market_index = ['XU030', 'XBANK']
-    start_date = '02-01-2012'
-    end_date = '30-12-2022'
-    frequency = '1m'
-    drop_na = False
-    save_to_excel = True
-    exchange = 'USD'
+df = stock_data.get_data(
+    symbols=['THYAO','EUPWR'],
+    start_date='01-01-2012',
+    end_date='06-10-2023',
+    exchange='1',
+    frequency='1y',
+    return_type='1',
+    save_to_excel=True
+)
+print(df)
 
-    data = await fetch_data(
-        symbol=symbol,
-        stock_market_index=stock_market_index,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        drop_na=drop_na,
-        save_to_excel=save_to_excel,
-        exchange=exchange
-    )
-    return data
-
-async def run():
-    result = await main()
-    print(result)
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
+# Note: Data for the EUPWR stock before the year 2023 is unavailable, and therefore, it will not be displayed in the output.
 ```
 
-#### `fetch_financials`
+#### `Financials`
 
 * `symbol` (str or list, default None): Stock symbol or list of symbols (e.g. `'AKBNK'` or `['AKBNK','THYAO']`).
-* `start_year` (str, default None): Start year of the financial statements in 'YYYY' format (e.g. `'2022'`).
-* `end_year` (str, default None): End year of the financial statements in 'YYYY' format (e.g. `'2023'`).
+* `start_year` (str, default None): Start year of the financial statements in 'YYYY' format (e.g. `'2022'`). If not specified, it defaults to two years ago.
+* `end_year` (str, default None): End year of the financial statements in 'YYYY' format (e.g. `'2023'`). If not specified, it defaults to the current year.
 * `exchange` (str, default 'TRY'): Exchange for financial statements (`'TRY'`: Turkish Lira, `'USD'`: US Dollar).
 * `financial_group` (str, default '1'): Type of financial statement (`'1'`: Series XI NO:29, `'2'`: Non-Consolidated IFRS, `'3'`: Consolidated IFRS).
 * `save_to_excel` (bool, default False): Will it be saved in excel file?
-* `language` (str, default 'en'): Language of the outputs (`'tr'`: Turkish, `'en'`: English).
 
-The `fetch_financials` function returns a dictionary.
+The `get_data` method of the `Financials` class returns a dictionary.
 
 ```python
-# Example 1: Get the financial statements for a single stock, and save to excel file.
-symbol='THYAO'
-start_year='2022'
-end_year='2023'
-save_to_excel=True
+# Example 1: Retrieve financial statements for a single stock starting from the desired start year.
 
-data=fetch_financials(
-    symbol=symbol,
-    start_year=start_year,
-    end_year=end_year,
-    save_to_excel=save_to_excel
+financials = Financials()
+
+df = financials.get_data(
+    symbols='THYAO',
+    start_year='2020'
 )
+print(df)
 ```
 
 ```python
-# Example 2: Get the financial statements for multiple stocks according to non-consolidated IFRS.
-symbols=['AKBNK', 'THYAO']
-start_year='2022'
-end_year='2023'
-financial_group='2'
+# Example 2: Retrieve financial statements for multiple stocks within the desired start and end year range.
+# The desired company can be extracted from data stored in a dictionary as shown below.
 
-data=fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    end_year=end_year
-)
-```
+financials = Financials()
 
-```python
-# Example 3: Get financial statements for multiple specified stocks and access the balance sheet of a sample stock.
-symbols=['AKBNK', 'THYAO']
-start_year='2022'
-end_year='2023'
-
-data=fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    end_year=end_year
+df = financials.get_data(
+    symbols=['THYAO','PGSUS'],
+    start_year='2019',
+    end_year='2023',
+    exchange='TRY',
+    financial_group='1',
+    save_to_excel=True
 )
 
-# Financial statements of the THYAO stock in the example
-thyao_financials=data['THYAO']
+import pandas as pd
 
-# If the financial statements of the requested stock are not available, the data source has not published the table associated with the specified financial_group parameter.
+df_thyao = pd.DataFrame(df['THYAO'])
 ```
 
 ```python
-# Example 4: Data stored in a dictionary type can be combined in a data frame as follows.
+# Example 3: Retrieve financial statements for multiple stocks within the desired start and end year range.
 
-symbols=['SISE', 'THYAO']
-start_year='2018'
-language='en'
-exchange='USD'
+financials = Financials()
 
-veri = fetch_financials(
-    symbol=symbols,
-    start_year=start_year,
-    language=language,
-    exchange=exchange
+df = financials.get_data(
+    symbols=['THYAO','AKBNK'],
+    start_year='2019',
+    end_year='2023',
+    exchange='TRY',
+    financial_group='1',
+    save_to_excel=True
 )
 
-merged_data = pd.DataFrame()
-for symbol, data in veri.items():
-    data = data.rename(columns={symbol: 'ITEM'})
-    data['SYMBOL'] = symbol
-    merged_data = pd.concat([merged_data, data], ignore_index=True)
+# Note: The AKBNK stock featured in the example will not appear in the output due to non-compliance with Series XI NO:29 (IFRS should be used).
 ```
-
-#### `visualize_data`
-
-* `df` (pandas DataFrame, default None): The pandas DataFrame with stock data.
-* `plot_type` (str, default '1'). Visualization type (`'1'`: Line Chart, `'2'`: Correlation Heat Matrix, `'3'`: Scatter Matrix).
-* `normalization` (bool, default False): Will the data be normalized? When set to True the data is scaled between 0 and 1.
-* `language` (str, default 'en'): Language of the outputs (`'tr'`: Turkish, `'en'`: English).
-* `**kwargs`: Additional options specific to visualization types. These parameters can be used to make special adjustments for a specific visualization type.
-  * **kwargs Parameters for Visualization Types:
-    * Line Graph:
-      * `linewidth` (float, default 1.5): Line thickness.
-      * `fontsize` (int, default 12): Title size.
-      * `figsize` (tuple, default (10, 6)): Size of the graph output.
-    * Correlation Heat Matrix:
-      * `cmap` (str, default 'coolwarm'): Color map.
-      * `vmin` (float, default -1): The smallest value in the color map.
-      * `vmax` (float, default 1): The largest value in the color map.
-      * `fontsize` (int, default 12): Title size.
-      * `figsize` (tuple, default (10, 6)): Size of the graph output.
-    * Scatter Matrix:
-      * `alpha` (float, default 0.5): Point transparency.
-      * `fontsize` (int, default 12): Title size.
-      * `height` (float, default 2.5): Height of each subgraph.
-      * `aspect` (float, default 1): The width-to-height ratio of each subgraph.
-
-The `visualize_data` function represents the data in the pandas data frame with graphs and visual elements.
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS']
-    start_date = '01-01-2013'
-    end_date = '31-07-2023'
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date
-    )
-    return data
-
-async def run():
-    result = await main()
-    # Example 1: Line chart with normalized prices, thicker lines, increased title size, and output in English.
-    visualize_data(
-        df=result,
-        plot_type='1',
-        normalization=True,
-        linewidth=2,
-        fontsize=14
-    )
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_4.png?raw=true)
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN', 'SISE', 'EREGL', 'BIMAS']
-    start_date = '01-12-2012'
-    end_date = '31-07-2023'
-    frequency = '1m'
-    calculate_return = True
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return
-    )
-    return data
-
-async def run():
-    result = await main()
-    # Example 2: Correlation heat matrix with default parameters and output in English.
-    visualize_data(
-        df=result,
-        plot_type='2'
-    )
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_5.png?raw=true)
-
-```python
-import asyncio
-
-async def main():
-    symbol = ['AKBNK', 'THYAO', 'GARAN']
-    start_date = '01-12-2012'
-    end_date = '31-07-2023'
-    frequency = '1m'
-    calculate_return = True
-
-    data = await fetch_data(
-        symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
-        frequency=frequency,
-        calculate_return=calculate_return
-    )
-    return data
-
-async def run():
-    result = await main()
-    # Example 3: Scatter matrix with higher transparency, and output in English.
-    visualize_data(
-        df=result,
-        plot_type='3',
-        alpha=0.1
-    )
-
-async def main_wrapper():
-    task = asyncio.create_task(run())
-    await task
-
-await main_wrapper()
-```
-
-![](https://github.com/urazakgul/isyatirimhisse/blob/main/imgs/gorsel_ornek_6.png?raw=true)
 
 ## Notes
 
@@ -1175,6 +611,14 @@ await main_wrapper()
 ### v3.0.2 - 05/10/2023
 
 * Removed the limit on the number of stock symbols, which was 400.
+
+### v4.0.0 - 07/10/2023
+
+* Created two classes, `StockData` and `Financials`.
+* Updated parameters for the `get_data` method in the `StockData` class and the `get_data` method in the `Financials` class.
+* Modified the structure of table outputs.
+* Removed data visualization feature.
+* Removed asynchronous structure.
 
 ## License
 

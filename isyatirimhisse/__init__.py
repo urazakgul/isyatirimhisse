@@ -1,2 +1,2 @@
-from .FetchData import fetch_data, fetch_financials
-from .DataViz import visualize_data
+from .FetchStockData import StockData
+from .FetchFinancials import Financials

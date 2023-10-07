@@ -5,7 +5,7 @@ with open("README.md", "r", encoding = "utf-8") as fh:
 
 setup(
     name="isyatirimhisse",
-    version="3.0.2",
+    version="4.0.0",
     packages=find_packages(),
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
@@ -18,11 +18,7 @@ setup(
         "requests",
         "pandas",
         "numpy",
-        "matplotlib",
-        "seaborn",
         "openpyxl",
-        "asyncio",
-        "aiohttp"
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
