@@ -16,7 +16,7 @@ class Financials:
             exchange: str = 'TRY',
             financial_group: str = '1',
             save_to_excel: bool = False
-    ) -> dict:
+    ) -> pd.DataFrame:
         """
         Get financials from the IS Investment.
 
@@ -113,6 +113,7 @@ class Financials:
                 df_final[['itemCode', 'itemDescTr', 'itemDescEng']] = df_final[['itemCode', 'itemDescTr', 'itemDescEng']].apply(lambda x: x.str.strip())
 
                 data_dict[symbol] = df_final
+                df = pd.DataFrame(data_dict[symbol])
 
             else:
                 print(f"No data found for {symbol}. You may need to change the financial_group parameter.")
@@ -125,4 +126,4 @@ class Financials:
             writer.close()
             print(f"Data saved to financials_{current_datetime}")
 
-        return data_dict if data_dict else {}
+        return df if not df.empty else pd.DataFrame()
