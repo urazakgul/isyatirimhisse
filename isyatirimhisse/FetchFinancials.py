@@ -1,128 +1,137 @@
 import pandas as pd
 import requests
 from datetime import datetime
+from typing import List, Optional, Union
 
-class Financials:
-    BASE_URL = "https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/Data.aspx/MaliTablo"
+BASE_URL = "https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/Data.aspx/MaliTablo"
 
-    def __init__(self):
-        pass
+def fetch_financials(
+    symbols: Union[List[str], str],
+    start_year: Optional[Union[str, int]] = None,
+    end_year: Optional[Union[str, int]] = None,
+    exchange: str = 'TRY',
+    financial_group: str = '1',
+    save_to_excel: bool = False
+) -> pd.DataFrame:
+    """
+    Fetch annual and quarterly financial statement data for one or more symbols from the IS Investment API.
 
-    def get_data(
-            self,
-            symbols: list = None,
-            start_year: str = None,
-            end_year: str = None,
-            exchange: str = 'TRY',
-            financial_group: str = '1',
-            save_to_excel: bool = False
-    ) -> dict:
-        """
-        Get financials from the IS Investment.
+    Parameters
+    ----------
+    symbols : str or list of str
+        Stock symbol or list of stock symbols for which to fetch financials.
+    start_year : str or int, optional
+        Start year (inclusive). Defaults to two years prior to the current year.
+    end_year : str or int, optional
+        End year (inclusive). Defaults to the current year.
+    exchange : str, default 'TRY'
+        Currency ('TRY' or 'USD').
+    financial_group : str, default '1'
+        Financial group identifier: '1' for XI_29, '2' for UFRS, or '3' for UFRS_K.
+    save_to_excel : bool, default False
+        If True, saves the resulting statements to an Excel file.
 
-        :param symbols: List of stock symbols.
-        :param start_year: Start year for the data.
-        :param end_year: End year for the data.
-        :param exchange: Currency exchange type ('TRY' or 'USD').
-        :param financial_group: Financial group identifier ('1', '2', or '3').
-        :param save_to_excel: Whether to save data to an Excel file.
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing all financial statements for all requested symbols, stacked vertically, with a SYMBOL column.
+    """
+    if not symbols:
+        raise ValueError("The 'symbols' parameter is required and cannot be empty.")
+    if isinstance(symbols, str):
+        symbols = [symbols]
+    try:
+        start_year = int(start_year) if start_year else datetime.now().year - 2
+        end_year = int(end_year) if end_year else datetime.now().year
+    except Exception:
+        raise ValueError("'start_year' and 'end_year' must be convertible to integers.")
 
-        :return: Dictionary containing financial statements for each symbol.
-        """
-        if not symbols or symbols is None:
-            raise ValueError("The 'symbols' parameter is required.")
+    if end_year < start_year:
+        raise ValueError("'end_year' must be greater than or equal to 'start_year'.")
 
-        if not isinstance(symbols, list):
-            symbols = [symbols]
+    if exchange.upper() not in ('TRY', 'USD'):
+        raise ValueError("The 'exchange' parameter must be either 'TRY' or 'USD'.")
 
-        if not start_year or start_year is None:
-            start_year = datetime.now().year - 2
-        else:
-            start_year = int(start_year)
+    if financial_group not in ('1', '2', '3'):
+        raise ValueError("The 'financial_group' parameter must be '1' (XI_29), '2' (UFRS), or '3' (UFRS_K).")
 
-        if not end_year or end_year is None:
-            end_year = datetime.now().year
-        else:
-            end_year = int(end_year)
+    group_map = {'1': 'XI_29', '2': 'UFRS', '3': 'UFRS_K'}
+    financial_group_label = group_map[financial_group]
 
-        if end_year < start_year:
-            raise ValueError("The end_year must be greater than or equal to the start_year.")
+    periods = [3, 6, 9, 12]
+    data_frames = []
 
-        if exchange.upper() not in ['TRY', 'USD']:
-            raise ValueError("Invalid currency exchange. Exchange currency must be either 'TRY' (Turkish Lira) or 'USD' (US Dollar) only.")
+    for symbol in symbols:
+        urls = []
+        for year in range(start_year, end_year + 1):
+            params = {
+                "companyCode": symbol,
+                "exchange": exchange.upper(),
+                "financialGroup": financial_group_label,
+                "year1": year, "period1": periods[0],
+                "year2": year, "period2": periods[1],
+                "year3": year, "period3": periods[2],
+                "year4": year, "period4": periods[3]
+            }
+            param_str = '&'.join(f"{k}={v}" for k, v in params.items())
+            urls.append(f"{BASE_URL}?{param_str}")
 
-        if financial_group not in ['1', '2', '3']:
-            raise ValueError("Invalid financial group. The 'financial_group' parameter must be '1' for XI_29, '2' for UFRS, or '3' for UFRS_K.")
+        data_list = []
+        quarters = [f"{year}/{month}" for year in range(start_year, end_year + 1) for month in periods]
 
-        if financial_group == '1':
-            financial_group = 'XI_29'
-        elif financial_group == '2':
-            financial_group = 'UFRS'
-        elif financial_group == '3':
-            financial_group = 'UFRS_K'
-
-        periods = [3, 6, 9, 12]
-        data_dict = {}
-
-        for symbol in symbols:
-            urls = []
-            for year in range(start_year, end_year + 1):
-                parameters = {
-                    "companyCode": symbol,
-                    "exchange": exchange,
-                    "financialGroup": f'{financial_group}',
-                    "year1": year,
-                    "period1": periods[0],
-                    "year2": year,
-                    "period2": periods[1],
-                    "year3": year,
-                    "period3": periods[2],
-                    "year4": year,
-                    "period4": periods[3]
-                }
-                url = f"{self.BASE_URL}?{'&'.join(f'{key}={value}' for key, value in parameters.items())}"
-                urls.append(url)
-
-            data_list = []
-            quarters = [f"{year}/{month}" for year in range(start_year, end_year + 1) for month in periods]
-
-            for url in urls:
-                res = requests.get(url)
-                if res.status_code != 200:
-                    raise ConnectionError(f"HTTP Status Code: {res.status_code}")
+        for url in urls:
+            try:
+                res = requests.get(url, timeout=10)
+                res.raise_for_status()
                 result = res.json()
                 if result.get('value'):
-                    result_value = pd.DataFrame(result['value'])
-                    result_value.columns = result_value.columns[:3].tolist() + quarters[:4]
-                    quarters = quarters[4:]
-                    data_list.append(result_value)
+                    df = pd.DataFrame(result['value'])
+                    if not df.empty:
+                        base_cols = df.columns[:3].tolist()
+                        quarter_cols = quarters[:4]
+                        df.columns = base_cols + quarter_cols
+                        quarters = quarters[4:]
+                        data_list.append(df)
+                    else:
+                        quarters = quarters[4:]
                 else:
                     quarters = quarters[4:]
+            except Exception as e:
+                print(f"[Warning] Could not fetch data for '{symbol}' in one period: {e}")
+                quarters = quarters[4:]
 
-            if data_list:
-                df_final = data_list[0]
-                for i in range(1, len(data_list)):
-                    df_final = pd.merge(
-                        df_final, data_list[i],
-                        on=['itemCode', 'itemDescTr', 'itemDescEng'],
-                        how='outer', suffixes=('', f'_{i}')
-                    )
+        if data_list:
+            df_final = data_list[0]
+            for i in range(1, len(data_list)):
+                df_final = pd.merge(
+                    df_final, data_list[i],
+                    on=['itemCode', 'itemDescTr', 'itemDescEng'],
+                    how='outer', suffixes=('', f'_{i}')
+                )
+            null_cols = df_final.columns[df_final.isnull().all()]
+            df_final = df_final.drop(columns=null_cols)
+            for col in ['itemCode', 'itemDescTr', 'itemDescEng']:
+                if col in df_final.columns:
+                    df_final[col] = df_final[col].astype(str).str.strip()
+            df_final["SYMBOL"] = symbol
+            df_final = df_final.rename(columns={
+                "itemCode": "FINANCIAL_ITEM_CODE",
+                "itemDescTr": "FINANCIAL_ITEM_NAME_TR",
+                "itemDescEng": "FINANCIAL_ITEM_NAME_EN"
+            })
+            data_frames.append(df_final)
+        else:
+            print(f"[Info] No financial data found for symbol '{symbol}'. You may need to adjust the financial_group or years.")
 
-                null_columns = df_final.columns[df_final.isnull().all()]
-                df_final = df_final.drop(columns=null_columns)
-                df_final[['itemCode', 'itemDescTr', 'itemDescEng']] = df_final[['itemCode', 'itemDescTr', 'itemDescEng']].apply(lambda x: x.str.strip())
+    if not data_frames:
+        raise ValueError("No financial data was fetched for any symbol. Please check your parameters.")
 
-                data_dict[symbol] = df_final
+    combined_data = pd.concat(data_frames, ignore_index=True)
 
-            else:
-                print(f"No data found for {symbol}. You may need to change the financial_group parameter.")
+    if save_to_excel:
+        current_datetime = datetime.now().strftime("%Y%m%d")
+        file_name = f"financials_{current_datetime}.xlsx"
+        combined_data.to_excel(file_name, index=False)
+        print(f"[Success] Data saved to '{file_name}'.")
 
-        if save_to_excel:
-            current_datetime = datetime.now().strftime("%Y%m%d")
-            writer = pd.ExcelWriter(f"financials_{current_datetime}.xlsx", engine='openpyxl')
-            for symbol, df in data_dict.items():
-                df.to_excel(writer, sheet_name=symbol, index=False)
-            writer.close()
-            print(f"Data saved to financials_{current_datetime}")
-
-        return data_dict if data_dict else {}
+    return combined_data

@@ -5,11 +5,11 @@ with open("README.md", "r", encoding = "utf-8") as fh:
 
 setup(
     name="isyatirimhisse",
-    version="4.0.0",
+    version="5.0.0",
     packages=find_packages(),
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
-    description="İş Yatırım'ın web sitesinden veri çekme işlemlerini kolaylaştıran ve isteğe göre özelleştirilebilen bir kütüphane.",
+    description="Fetches data from the IS Investment website.",
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/urazakgul/isyatirimhisse",
@@ -17,7 +17,6 @@ setup(
     install_requires=[
         "requests",
         "pandas",
-        "numpy",
         "openpyxl",
     ],
     classifiers=[
