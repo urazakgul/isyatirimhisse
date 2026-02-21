@@ -1,4 +1,4 @@
-# isyatirimhisse v5.0.0
+# isyatirimhisse v5.0.1
 
 ## Türkçe tercih edenler için:
 
@@ -42,7 +42,7 @@ pip install isyatirimhisse
 Spesifik bir versiyona ait kurulum yapacaksanız aşağıdaki örnekte olduğu gibi komutu çalıştırabilirsiniz.
 
 ```bash
-pip install isyatirimhisse==5.0.0
+pip install isyatirimhisse==5.0.1
 ```
 
 Yüklü paketin versiyonuna aşağıdaki komut yardımıyla ulaşabilirsiniz.
@@ -215,6 +215,10 @@ df = fetch_financials(
 * `fetch_stock_data`, `fetch_index_data`, `fetch_financials` fonksiyonları eklendi.
 * Kod ve dökümantasyon sadeleştirildi.
 
+### v5.0.1 - 21/02/2026
+
+* `truststore` ile SSL sertifika doğrulama hatası giderildi.
+
 ## Lisans
 
 Bu proje MIT Lisansı altında lisanslanmıştır.
@@ -260,7 +264,7 @@ pip install isyatirimhisse
 If you want to install a specific version, run the command as shown below:
 
 ```bash
-pip install isyatirimhisse==5.0.0
+pip install isyatirimhisse==5.0.1
 ```
 
 You can check the installed package version using the following command:
@@ -432,6 +436,10 @@ df = fetch_financials(
 * Removed class structure; switched to a function-based API.
 * Added `fetch_stock_data`, `fetch_index_data`, and `fetch_financials` functions.
 * Simplified code and documentation.
+
+### v5.0.1 - 21/02/2026
+
+* Fixed SSL certificate verification with `truststore`.
 
 ## License
 

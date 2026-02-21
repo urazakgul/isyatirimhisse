@@ -3,6 +3,15 @@ import requests
 from datetime import datetime
 from typing import List, Optional, Union
 
+try:
+    import truststore
+    truststore.inject_into_ssl()
+    _SSL_VERIFY = True
+except ImportError:
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    _SSL_VERIFY = False
+
 BASE_URL = "https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/Data.aspx/MaliTablo"
 
 def fetch_financials(
@@ -81,7 +90,7 @@ def fetch_financials(
 
         for url in urls:
             try:
-                res = requests.get(url, timeout=10)
+                res = requests.get(url, timeout=10, verify=_SSL_VERIFY)
                 res.raise_for_status()
                 result = res.json()
                 if result.get('value'):

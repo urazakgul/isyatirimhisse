@@ -3,6 +3,15 @@ import pandas as pd
 from datetime import datetime
 from typing import List, Optional, Union
 
+try:
+    import truststore
+    truststore.inject_into_ssl()
+    _SSL_VERIFY = True
+except ImportError:
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    _SSL_VERIFY = False
+
 BASE_URL = "https://www.isyatirim.com.tr/_layouts/15/Isyatirim.Website/Common/Data.aspx/HisseTekil"
 
 def fetch_stock_data(
@@ -43,7 +52,7 @@ def fetch_stock_data(
     for symbol in symbols:
         url = f"{BASE_URL}?hisse={symbol}&startdate={start_date}&enddate={end_date}"
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=10, verify=_SSL_VERIFY)
             response.raise_for_status()
             data = pd.DataFrame(response.json().get("value", []))
         except Exception as e:

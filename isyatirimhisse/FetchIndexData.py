@@ -3,6 +3,15 @@ import pandas as pd
 from datetime import datetime
 from typing import List, Optional, Union
 
+try:
+    import truststore
+    truststore.inject_into_ssl()
+    _SSL_VERIFY = True
+except ImportError:
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    _SSL_VERIFY = False
+
 BASE_URL_INDEX = "https://www.isyatirim.com.tr/_Layouts/15/IsYatirim.Website/Common/ChartData.aspx/IndexHistoricalAll"
 
 def fetch_index_data(
@@ -58,7 +67,7 @@ def fetch_index_data(
             f"&from={start_date_api}&to={end_date_api}&endeks={idx}"
         )
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=10, verify=_SSL_VERIFY)
             response.raise_for_status()
             json_data = response.json()
             raw = json_data.get("data", [])

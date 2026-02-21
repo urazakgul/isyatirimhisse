@@ -5,7 +5,7 @@ with open("README.md", "r", encoding = "utf-8") as fh:
 
 setup(
     name="isyatirimhisse",
-    version="5.0.0",
+    version="5.0.1",
     packages=find_packages(),
     author="Uraz Akgül",
     author_email="urazdev@gmail.com",
